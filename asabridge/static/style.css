@@ -2,3 +2,29 @@ body {
    background-color: #f8f9fa!important;
    margin: 20px;
 }
+
+.login-form-header {
+    text-align: center;
+}
+
+.login-form {
+    max-width: 420px;
+    padding: 35px;
+    margin: 0 auto;
+    border-radius: 7px;
+}
+
+.username-input {
+    margin-bottom: 4px;
+}
+
+.copyright-container {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 0px 35px;
+}
+
+.copyright-text {
+    text-align: right;
+    font-size: 0.8rem;
+}

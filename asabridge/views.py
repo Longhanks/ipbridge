@@ -11,6 +11,12 @@ from asabridge.app import app, auth
 from asabridge import readinglist
 from asabridge import validators
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        print('Loggin in...')
+    return render_template('login.html')
+
 
 @auth.verify_password
 def verify_password(username, password):
