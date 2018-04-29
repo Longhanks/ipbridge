@@ -16,21 +16,20 @@ virtualenv venv
 pip install -e .
 ```
 
+You must find a way to allow the processes nginx, gunicorn and python3 to control your computer (macOS Security settings).
+For example, use [tccutil](https://github.com/jacobsalmela/tccutil "tccutil").
+
 ## Running
 
 ### Dev
 
 ```bash
-FLASK_APP=asabridge FLASK_DEBUG=1 flask run
+FLASK_APP=autoapp.py FLASK_DEBUG=1 flask run
 ```
 
 ### Production
 
-Needs `asabridge/certs/fullchain.pem` and `asabridge/certs/privkey.pem`.
-
-```bash
-python3 asabridge/__init__.py
-```
+Use the nginx config file for a reverse proxy. Take a look at the LaunchAgent plist to see the gunicorn flags. Then start gunicorn and nginx to deploy the application.
 
 ## Ideas/ToDo
 

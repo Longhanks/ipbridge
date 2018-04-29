@@ -12,6 +12,8 @@
             <string>/usr/local/bin/gunicorn</string>
             <string>-w</string>
             <string>5</string>
+            <string>--bind</string>
+            <string>127.0.0.1:12136</string>
             <string>autoapp</string>
         </array>        
         <key>StandardOutPath</key>

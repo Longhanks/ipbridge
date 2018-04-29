@@ -5,7 +5,7 @@ import datetime
 from dateutil import tz
 import urllib
 
-from flask import Blueprint, request, redirect, url_for, render_template, abort
+from flask import Blueprint, request, redirect, url_for, render_template, abort, current_app
 
 from asabridge import validators
 from asabridge.extensions import auth

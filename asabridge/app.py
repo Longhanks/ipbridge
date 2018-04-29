@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import simplepam
+import logging
 from flask import Flask
 
 from asabridge import login, readinglist
@@ -8,6 +9,10 @@ from asabridge.extensions import cache, auth
 
 def create_app():
     app = Flask(__name__.split('.')[0])
+    if __name__ != '__main__':
+        gunicorn_logger = logging.getLogger('gunicorn.error')
+        app.logger.handlers = gunicorn_logger.handlers
+        app.logger.setLevel(gunicorn_logger.level)
     register_extensions(app)
     register_blueprints(app)
     return app
