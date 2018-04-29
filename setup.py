@@ -7,9 +7,11 @@ setup(
     install_requires=[
         'flask',
         'flask_httpauth',
+        'flask-caching',
         'simplepam',
         'humanize',
-        'python-dateutil'
+        'python-dateutil',
+        'redis'
     ],
 )
 

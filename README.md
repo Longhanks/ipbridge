@@ -1,8 +1,37 @@
 # asabridge
 
-API for exposing macOS services.
+Web access to local macOS services.
 
-## Ideas
+## Requirements
+
+- Python 3.4 or newer
+- [redis](https://redis.io "redis")
+
+## Getting started
+
+```bash
+virtualenv venv
+. venv/bin/activate
+pip install -e .
+```
+
+## Running
+
+### Dev
+
+```bash
+FLASK_APP=asabridge FLASK_DEBUG=1 flask run
+```
+
+### Production
+
+Needs `asabridge/certs/fullchain.pem` and `asabridge/certs/privkey.pem`.
+
+```bash
+python3 asabridge/__init__.py
+```
+
+## Ideas/ToDo
 
 - Implement caching + auto syncback.
 - Implement proper login via session.
