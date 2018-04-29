@@ -57,6 +57,6 @@ def delete_readinglist_item(host, previewText):
         return
     if host == previewText:
         previewText = ''
-    osascript_call = ['osascript', app.root_path + '/static/remove_readinglist.scpt', host, previewText]
+    osascript_call = ['osascript', '-l', 'JavaScript', app.root_path + '/static/remove_readinglist.js', host, previewText]
     subprocess.check_call(osascript_call)
     time.sleep(3)
