@@ -12,6 +12,12 @@ from asabridge.app import app
 def get_readinglist():
     if app.debug:
         sample_data = [{
+            'title': 'Google',
+            'URLString': 'https://www.google.com/',
+            'imageURL': None,
+            'DateAdded': datetime.datetime(2018, 4, 29, 0, 46, 15, 247691, tzinfo=tz.tzlocal()),
+            'PreviewText': 'Google+ Suche Bilder Maps Play YouTube News Gmail Mehr Andreas Schulz Erweiterte Suche Sprachoptionen Google angeboten in: English Werben mit GoogleUnternehmensangebote+GoogleÜber GoogleGoogle.de © 2018 - Daten'
+            }, {
             'title': 'reddit: the front page of the internet',
             'URLString': 'https://www.reddit.com/r/cpp/comments/8drshx/c_templates_revised_nicolai_josuttis_accu_2018/',
             'imageURL': 'https://i.ytimg.com/vi/9PFMllbyaLM/hqdefault.jpg',
@@ -32,7 +38,7 @@ def get_readinglist():
         pythonic_readinglist_item['URLString'] = item['URLString']
         pythonic_readinglist_item['imageURL'] = item.get('imageURL')
         pythonic_readinglist_item['DateAdded'] = item['ReadingList']['DateAdded'].replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal())
-        pythonic_readinglist_item['PreviewText'] = item['ReadingList'].get('PreviewText')
+        pythonic_readinglist_item['PreviewText'] = item['ReadingList'].get('PreviewText') or pythonic_readinglist_item['title']
         pythonic_readinglist.append(pythonic_readinglist_item)
     return pythonic_readinglist
 
@@ -42,5 +48,15 @@ def add_readinglist_item(url):
         return
     js_call = 'Application("Safari").addReadingListItem("' + url + '")'
     osascript_call = ['osascript', '-l', 'JavaScript', '-e', js_call]
+    subprocess.check_call(osascript_call)
+    time.sleep(3)
+
+
+def delete_readinglist_item(host, previewText):
+    if app.debug:
+        return
+    if host == previewText:
+        previewText = ''
+    osascript_call = ['osascript', app.root_path + '/static/remove_readinglist.scpt', host, previewText]
     subprocess.check_call(osascript_call)
     time.sleep(3)

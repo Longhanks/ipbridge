@@ -28,3 +28,24 @@ body {
     text-align: right;
     font-size: 0.8rem;
 }
+
+.rl-item-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.rl-preview-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.rl-item-delete {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 20px;
+}
+
+.rl-item:hover .rl-item-delete {
+    display: flex;
+}
