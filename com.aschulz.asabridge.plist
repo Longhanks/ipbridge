@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0">
+    <dict>
+        <key>KeepAlive</key>
+        <true/>
+        <key>Label</key>
+        <string>com.aschulz.asabridge</string>
+        <key>WorkingDirectory</key>
+        <string>/Users/aschulz/Projects/asabridge</string>
+        <key>ProgramArguments</key>
+        <array>
+            <string>/usr/local/bin/gunicorn</string>
+            <string>-w</string>
+            <string>5</string>
+            <string>autoapp</string>
+        </array>        
+        <key>StandardOutPath</key>
+        <string>/Users/aschulz/Projects/asabridge/log/asabridge.log</string>
+        <key>StandardErrorPath</key>
+        <string>/Users/aschulz/Projects/asabridge/log/asabridge_error.log</string>
+    </dict>
+</plist>

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # system imports.
 import datetime
 import plistlib
@@ -6,11 +7,12 @@ import subprocess
 import time
 from dateutil import tz
 
-from asabridge.app import app
+from flask import current_app
+from flask.helpers import get_debug_flag
 
 
 def get_readinglist():
-    if app.debug:
+    if get_debug_flag():
         sample_data = [{
             'title': 'Google',
             'URLString': 'https://www.google.com/',
@@ -44,7 +46,7 @@ def get_readinglist():
 
 
 def add_readinglist_item(url):
-    if app.debug:
+    if get_debug_flag():
         return
     js_call = 'Application("Safari").addReadingListItem("' + url + '")'
     osascript_call = ['osascript', '-l', 'JavaScript', '-e', js_call]
@@ -53,10 +55,10 @@ def add_readinglist_item(url):
 
 
 def delete_readinglist_item(host, previewText):
-    if app.debug:
+    if get_debug_flag():
         return
     if host == previewText:
         previewText = ''
-    osascript_call = ['osascript', '-l', 'JavaScript', app.root_path + '/static/remove_readinglist.js', host, previewText]
+    osascript_call = ['osascript', '-l', 'JavaScript', current_app.root_path + '/static/remove_readinglist.js', host, previewText]
     subprocess.check_call(osascript_call)
     time.sleep(3)

@@ -3,7 +3,7 @@
   <div class="container">
     <h1>readinglist</h1>
     <br>
-    <form class="needs-validation" action="{{ url_for('front_add_readinglist_item') }}" method=post novalidate>
+    <form class="needs-validation" action="{{ url_for('readinglist.add_readinglist_item') }}" method=post novalidate>
       <div class="form-group form-group-sm">
         <input type="url" name="url" class="form-control" id="urlInput" placeholder="Enter link" required>
         <div class="invalid-feedback">
@@ -26,7 +26,7 @@
             <div class="rl-preview-container">
               <small class="text-muted">{{ entry.PreviewText }}</small>
               <div class="rl-item-delete">
-                <form action="{{ url_for('front_delete_readinglist_item') }}" method=post novalidate>
+                <form action="{{ url_for('readinglist.delete_readinglist_item') }}" method=post novalidate>
                   <input type="hidden" name="URLString" value="{{ entry.URLString }}" />
                   <input type="hidden" name="PreviewText" value="{{ entry.PreviewText }}" />
                   <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>

@@ -1,16 +1,27 @@
-# system imports.
-
-from pathlib import Path
-
-# flask imports.
+# -*- coding: utf-8 -*-
+import simplepam
 from flask import Flask
-from flask_httpauth import HTTPBasicAuth
 
-# Create SSL context.
-ssl_context = None
-certs = Path(__file__).resolve().parent / 'certs'
-if certs.exists() and certs.is_dir():
-    ssl_context = (str(certs / 'fullchain.pem'), str(certs / 'privkey.pem'))
+from asabridge import login, readinglist
+from asabridge.extensions import cache, auth
 
-app = Flask(__name__)
-auth = HTTPBasicAuth()
+
+def create_app():
+    app = Flask(__name__.split('.')[0])
+    register_extensions(app)
+    register_blueprints(app)
+    return app
+
+
+def register_extensions(app):
+    """Register Flask extensions."""
+    cache.init_app(app)
+    @auth.verify_password
+    def login(username, password):
+        return simplepam.authenticate(username, password)
+
+
+def register_blueprints(app):
+    """Register Flask blueprints."""
+    app.register_blueprint(login.views.blueprint)
+    app.register_blueprint(readinglist.views.blueprint)
