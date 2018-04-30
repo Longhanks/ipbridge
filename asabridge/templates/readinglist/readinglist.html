@@ -27,8 +27,7 @@
               <small class="text-muted">{{ entry.PreviewText }}</small>
               <div class="rl-item-delete">
                 <form action="{{ url_for('readinglist.delete_readinglist_item') }}" method=post novalidate>
-                  <input type="hidden" name="URLString" value="{{ entry.URLString }}" />
-                  <input type="hidden" name="PreviewText" value="{{ entry.PreviewText }}" />
+                  <input type="hidden" name="index" value="{{ loop.index0 }}" />
                   <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                 </form>
               </div>

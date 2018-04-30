@@ -7,9 +7,7 @@ for (var i = 0; i < args.count; i++) {
 }
 delete args
 
-console.log("Looking for:")
-console.log(`"${argv[4]}"`)
-console.log(`"${argv[5]}"`)
+var readingListItemIndex = parseInt(argv[4])
 
 var Safari = Application("Safari")
 var SE = Application('System Events')
@@ -47,19 +45,13 @@ for (var i = 0; i < readingList.rows.length; ++i) {
     }
 }
 
-for (var i = 0; i < realItems.length; ++i) {
-    var hostName = realItems[i].uiElements[0].uiElements[2].value()
-    var previewText = realItems[i].uiElements[0].uiElements[1].value()
-    if (hostName === argv[4] && previewText === argv[5]) {
-        var app = Application.currentApplication()
-        app.includeStandardAdditions = true
+var x = realItems[readingListItemIndex].position()[0] + 5
+var y = realItems[readingListItemIndex].position()[1] + 5
 
-        var x = realItems[0].position()[0] + 5
-        var y = realItems[0].position()[1] + 5
-        app.doShellScript(`/usr/local/bin/cliclick rc:${x},${y}`)
-        readingList.menus[0].menuItems[5].actions.byName("AXPress").perform()
-    }
-}
+var app = Application.currentApplication()
+app.includeStandardAdditions = true
+app.doShellScript(`/usr/local/bin/cliclick rc:${x},${y}`)
+readingList.menus[0].menuItems[5].actions.byName("AXPress").perform()
 
 Safari.windows[0].close()
 

@@ -31,18 +31,8 @@ def add_readinglist_item():
 @blueprint.route('/readinglist/delete', methods=['POST'])
 @auth.login_required
 def delete_readinglist_item():
-    url = request.form['URLString'] or ''
-    validator = validators.URLValidator()
-    try:
-        validator(url)
-    except validators.ValidationError as error:
-        abort(400, error.message)
-    parsed_url = urllib.parse.urlparse(url)
-    host = parsed_url.hostname
-    if host.startswith('www.'):
-        host = host[4:]
-    previewText = request.form['PreviewText'] or ''
-    readinglist.delete_readinglist_item(host, previewText)
+    index = request.form['index'] or -1
+    readinglist.delete_readinglist_item(index)
     return redirect(url_for('readinglist.get_readinglist_items'))
 
 

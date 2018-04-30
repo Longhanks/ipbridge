@@ -54,11 +54,9 @@ def add_readinglist_item(url):
     time.sleep(3)
 
 
-def delete_readinglist_item(host, previewText):
+def delete_readinglist_item(index):
     if get_debug_flag():
         return
-    if host == previewText:
-        previewText = ''
-    osascript_call = ['osascript', '-l', 'JavaScript', current_app.root_path + '/static/remove_readinglist.js', host, previewText]
+    osascript_call = ['osascript', '-l', 'JavaScript', current_app.root_path + '/static/remove_readinglist.js', str(index)]
     subprocess.check_call(osascript_call)
     time.sleep(3)
