@@ -14,11 +14,13 @@
             <string>5</string>
             <string>--bind</string>
             <string>127.0.0.1:12136</string>
+            <string>--log-level</string>
+            <string>debug</string>
             <string>autoapp</string>
         </array>        
         <key>StandardOutPath</key>
         <string>/Users/aschulz/Projects/asabridge/log/asabridge.log</string>
         <key>StandardErrorPath</key>
-        <string>/Users/aschulz/Projects/asabridge/log/asabridge_error.log</string>
+        <string>/Users/aschulz/Projects/asabridge/log/asabridge.log</string>
     </dict>
 </plist>
