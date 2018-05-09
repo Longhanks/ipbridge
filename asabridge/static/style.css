@@ -40,12 +40,13 @@ body {
 }
 
 .rl-item-delete {
-    display: none;
+    display: flex;
+    visibility: hidden;
     flex-direction: column;
     justify-content: center;
     margin-left: 20px;
 }
 
 .rl-item:hover .rl-item-delete {
-    display: flex;
+    visibility: visible;
 }
