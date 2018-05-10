@@ -16,7 +16,7 @@
         <array>
             <string>/bin/bash</string>
             <string>-c</string>
-            <string>/usr/bin/tail -n0 -f asabridge.log | /usr/local/bin/rtail --name asabridge.log</string>
+            <string>/usr/bin/tail -n0 -F asabridge.log | /usr/local/bin/rtail --name asabridge.log</string>
         </array>        
         <key>StandardOutPath</key>
         <string>/Users/aschulz/Projects/asabridge/log/asabridge-logging-broadcast.log</string>
