@@ -5,7 +5,8 @@ from flask import Flask
 from flask.helpers import get_debug_flag
 
 from asabridge import login, readinglist
-from asabridge.extensions import cache, auth
+from asabridge.extensions import cache, login_manager
+from asabridge.user import User
 
 
 def create_app():
@@ -14,6 +15,8 @@ def create_app():
         gunicorn_logger = logging.getLogger('gunicorn.error')
         app.logger.handlers = gunicorn_logger.handlers
         app.logger.setLevel(gunicorn_logger.level)
+    # Change me!
+    app.secret_key = b'Z\xb2\xb7S\xd9D\xe7\x05\xc7\r\xf2dR\xd9\xe9n'
     register_extensions(app)
     register_blueprints(app)
     return app
@@ -22,9 +25,10 @@ def create_app():
 def register_extensions(app):
     """Register Flask extensions."""
     cache.init_app(app)
-    @auth.verify_password
-    def login(username, password):
-        return simplepam.authenticate(username, password)
+    login_manager.init_app(app)
+    login_manager.login_view = 'login.login'
+    login_manager.login_message = None
+    login_manager.user_loader(lambda id: User(id))
 
 
 def register_blueprints(app):

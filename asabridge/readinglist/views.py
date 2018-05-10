@@ -6,9 +6,9 @@ from dateutil import tz
 import urllib
 
 from flask import Blueprint, request, redirect, url_for, render_template, abort, current_app
+from flask_login import login_required
 
 from asabridge import validators
-from asabridge.extensions import auth
 
 from . import readinglist
 
@@ -16,7 +16,7 @@ blueprint = Blueprint('readinglist', __name__, static_folder='../static')
 
 
 @blueprint.route('/readinglist/add', methods=['POST'])
-@auth.login_required
+@login_required
 def add_readinglist_item():
     url = request.form['url'] or ''
     validator = validators.URLValidator()
@@ -29,7 +29,7 @@ def add_readinglist_item():
 
 
 @blueprint.route('/readinglist/delete', methods=['POST'])
-@auth.login_required
+@login_required
 def delete_readinglist_item():
     index = request.form['index'] or -1
     readinglist.delete_readinglist_item(index)
@@ -37,7 +37,7 @@ def delete_readinglist_item():
 
 
 @blueprint.route('/readinglist', methods=['GET'])
-@auth.login_required
+@login_required
 def get_readinglist_items():
     entries = readinglist.get_readinglist()
     for entry in entries:

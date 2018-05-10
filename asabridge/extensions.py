@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from flask_caching import Cache
-from flask_httpauth import HTTPBasicAuth
+from flask_login import LoginManager
 
-auth = HTTPBasicAuth()
 cache = Cache()
 cache = Cache(config={
     'CACHE_TYPE': 'redis',
@@ -11,3 +10,5 @@ cache = Cache(config={
     'CACHE_REDIS_PORT': '6379',
     'CACHE_REDIS_URL': 'redis://localhost:6379'
     })
+
+login_manager = LoginManager()

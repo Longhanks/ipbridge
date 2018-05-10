@@ -4,7 +4,7 @@
     <div class="login-form">
       <h3 class="login-form-header">asabridge login</h3>
       <br>
-      <form class="needs-validation" action="{{ url_for('login.login') }}" method=post novalidate>
+      <form class="needs-validation" method=POST novalidate>
         <div class="form-group form-group-sm">
           <input type="text" name="username" class="username-input form-control" id="usernameInput" placeholder="Username" required>
           <input type="password" name="password" class="password-input form-control" id="passwordInput" placeholder="Password" required>
