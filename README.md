@@ -24,7 +24,7 @@ For example, use [tccutil](https://github.com/jacobsalmela/tccutil "tccutil").
 ### Dev
 
 ```bash
-FLASK_APP=autoapp.py FLASK_DEBUG=1 flask run
+FLASK_APP=autoapp.py FLASK_ENV=development flask run
 ```
 
 ### Production

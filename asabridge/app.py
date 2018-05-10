@@ -2,6 +2,7 @@
 import simplepam
 import logging
 from flask import Flask
+from flask.helpers import get_debug_flag
 
 from asabridge import login, readinglist
 from asabridge.extensions import cache, auth
@@ -9,7 +10,7 @@ from asabridge.extensions import cache, auth
 
 def create_app():
     app = Flask(__name__.split('.')[0])
-    if __name__ != '__main__':
+    if __name__ != '__main__' and not get_debug_flag():
         gunicorn_logger = logging.getLogger('gunicorn.error')
         app.logger.handlers = gunicorn_logger.handlers
         app.logger.setLevel(gunicorn_logger.level)
