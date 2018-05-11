@@ -4,7 +4,7 @@
     <div class="login-form">
       <h3 class="login-form-header">asabridge login</h3>
       <br>
-      <form class="needs-validation" method=POST novalidate>
+      <form class="{{'was-validated' if session['failed_login_attempt']}} needs-validation" method=POST novalidate>
         <div class="form-group form-group-sm">
           <input type="text" name="username" class="username-input form-control" id="usernameInput" placeholder="Username" autocorrect="off" autocapitalize="off" spellcheck="off" required>
           <input type="password" name="password" class="password-input form-control" id="passwordInput" placeholder="Password" required>
