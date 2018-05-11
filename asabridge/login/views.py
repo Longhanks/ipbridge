@@ -16,6 +16,14 @@ def is_safe_url(target):
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
 
 
+@blueprint.route('/isAuth', methods=['GET'])
+def isAuth():
+    if current_user.is_authenticated:
+        return '', 204
+    else:
+        abort(401)
+
+
 @blueprint.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
