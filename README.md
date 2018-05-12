@@ -8,7 +8,7 @@ Web access to local macOS services.
 - [cliclick](https://www.bluem.net/de/projekte/cliclick/ "cliclick")
 - [redis](https://redis.io "redis")
 
-## Getting started
+## Installation
 
 ```bash
 virtualenv venv
@@ -29,9 +29,12 @@ FLASK_APP=autoapp.py FLASK_ENV=development flask run
 
 ### Production
 
-Use the nginx config file for a reverse proxy. Take a look at the LaunchAgent plist to see the gunicorn flags. Then start gunicorn and nginx to deploy the application.
+- LaunchAgents: Change working directory from /Users/aschulz/Projects/asabridge to somwhere else.
+- Use the Launchagents to start asabridge at port 12136 and a log tailer that pipes to rtail.
+- nginx conf: Add domain name and SSL certificate + key. Provides a reverse proxy from 12137 to asabridge.
+- Take a look at the LaunchAgent plist to see the gunicorn flags.
+- Run [rtail-server](https://github.com/Longhanks/rtail-server "rtail-server") at 12138 (reverse proxy 12139).
 
 ## Ideas/ToDo
 
 - Implement caching + auto syncback.
-- Implement proper login via session.
