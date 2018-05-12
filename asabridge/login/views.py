@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, request, render_template, current_app, request, abort, url_for, redirect, session
-from flask_login import login_user, current_user, logout_user
+from flask_login import login_user, current_user, logout_user, login_required
 from urllib.parse import urlparse, urljoin
 import simplepam
 
@@ -22,6 +22,16 @@ def isAuth():
         return '', 204
     else:
         abort(401)
+
+
+@blueprint.route('/logs', methods=['GET'])
+@login_required
+def logs():
+    logs_abs_url = str(url_for('login.logs', _external=True))
+    root_url = logs_abs_url[:-len('/logs')]
+    rtail_url = root_url.replace('12137', '12139')
+    current_app.logger.debug('constructed ' + rtail_url)
+    return redirect(rtail_url)
 
 
 @blueprint.route('/login', methods=['GET', 'POST'])
