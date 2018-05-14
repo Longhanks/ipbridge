@@ -3,7 +3,7 @@ import logging
 from flask import Flask
 from flask.helpers import get_debug_flag
 
-from asabridge import login, logs, readinglist
+from asabridge import index, login, logs, readinglist
 from asabridge.extensions import cache, login_manager
 from asabridge.user import User
 
@@ -32,6 +32,7 @@ def register_extensions(app):
 
 def register_blueprints(app):
     """Register Flask blueprints."""
+    app.register_blueprint(index.views.blueprint)
     app.register_blueprint(login.views.blueprint)
     app.register_blueprint(logs.views.blueprint)
     app.register_blueprint(readinglist.views.blueprint)
