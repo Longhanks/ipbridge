@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-import simplepam
 import humanize
 import datetime
 from dateutil import tz
-import urllib
 
-from flask import Blueprint, request, redirect, url_for, render_template, abort, current_app
+from flask import Blueprint, request, redirect, url_for, render_template, abort
 from flask_login import login_required
 
 from asabridge import validators

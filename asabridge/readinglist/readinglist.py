@@ -35,11 +35,11 @@ def get_readinglist():
     readinglist_elements = readinglist.get('Children') or []
     pythonic_readinglist = []
     for item in readinglist_elements:
-        pythonic_readinglist_item = {}
-        pythonic_readinglist_item['title'] = item['URIDictionary']['title']
-        pythonic_readinglist_item['URLString'] = item['URLString']
-        pythonic_readinglist_item['imageURL'] = item.get('imageURL')
-        pythonic_readinglist_item['DateAdded'] = item['ReadingList']['DateAdded'].replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal())
+        pythonic_readinglist_item = {'title': item['URIDictionary']['title'],
+                                     'URLString': item['URLString'],
+                                     'imageURL': item.get('imageURL'),
+                                     'DateAdded': item['ReadingList']['DateAdded'].replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal())
+                                     }
         pythonic_readinglist_item['PreviewText'] = item['ReadingList'].get('PreviewText') or pythonic_readinglist_item['title']
         pythonic_readinglist.append(pythonic_readinglist_item)
     return pythonic_readinglist

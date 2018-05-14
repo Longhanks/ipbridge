@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-import simplepam
 import logging
 from flask import Flask
 from flask.helpers import get_debug_flag
 
-from asabridge import login, readinglist
+from asabridge import login, logs, readinglist
 from asabridge.extensions import cache, login_manager
 from asabridge.user import User
 
@@ -28,10 +27,11 @@ def register_extensions(app):
     login_manager.init_app(app)
     login_manager.login_view = 'login.login'
     login_manager.login_message = None
-    login_manager.user_loader(lambda id: User(id))
+    login_manager.user_loader(lambda _id: User(_id))
 
 
 def register_blueprints(app):
     """Register Flask blueprints."""
     app.register_blueprint(login.views.blueprint)
+    app.register_blueprint(logs.views.blueprint)
     app.register_blueprint(readinglist.views.blueprint)
