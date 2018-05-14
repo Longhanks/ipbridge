@@ -37,6 +37,4 @@ FLASK_APP=autoapp.py FLASK_ENV=development flask run
 
 ## Ideas/ToDo
 
-- Implement index/landing page.
-- Move /logs out of login to an own submodule.
 - Implement caching + auto syncback.

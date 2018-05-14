@@ -1,42 +1,45 @@
 {% extends "layout.html" %}
 {% block content %}
-  <div class="container">
-    <div class="login-form">
-      <h3 class="login-form-header">asabridge login</h3>
-      <br>
-      <form class="{{'was-validated' if session['failed_login_attempt']}} needs-validation" method=POST novalidate>
-        <div class="form-group form-group-sm">
-          <input type="text" name="username" class="username-input form-control" id="usernameInput" placeholder="Username" autocorrect="off" autocapitalize="off" spellcheck="off" required>
-          <input type="password" name="password" class="password-input form-control" id="passwordInput" placeholder="Password" required>
-          <div class="invalid-feedback">
-              Login failed.
-          </div>
+    <div class="container">
+        <div class="login-form">
+            <h3 class="login-form-header">asabridge login</h3>
+            <br>
+            <form class="{{ 'was-validated' if session['failed_login_attempt'] }} needs-validation" method=POST
+                  novalidate>
+                <div class="form-group form-group-sm">
+                    <input type="text" name="username" class="username-input form-control" id="usernameInput"
+                           placeholder="Username" autocorrect="off" autocapitalize="off" spellcheck="off" required>
+                    <input type="password" name="password" class="password-input form-control" id="passwordInput"
+                           placeholder="Password" required>
+                    <div class="invalid-feedback">
+                        Login failed.
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
         </div>
-        <button type="submit" class="btn btn-primary btn-block">Login</button>
-      </form>
+        <div class="copyright-container">
+            <p class="copyright-text text-muted">© Andreas Schulz</p>
+        </div>
     </div>
-    <div class="copyright-container">
-      <p class="copyright-text text-muted">© Andreas Schulz</p>
-    </div>
-  </div>
-  <script>
-      // Example starter JavaScript for disabling form submissions if there are invalid fields
-      (function() {
-        'use strict';
-        window.addEventListener('load', function() {
-          // Fetch all the forms we want to apply custom Bootstrap validation styles to
-          var forms = document.getElementsByClassName('needs-validation');
-          // Loop over them and prevent submission
-          var validation = Array.prototype.filter.call(forms, function(form) {
-            form.addEventListener('submit', function(event) {
-              if (form.checkValidity() === false) {
-                event.preventDefault();
-                event.stopPropagation();
-              }
-              form.classList.add('was-validated');
+    <script>
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.getElementsByClassName('needs-validation');
+                // Loop over them and prevent submission
+                var validation = Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
             }, false);
-          });
-        }, false);
-      })();
-      </script>
+        })();
+    </script>
 {% endblock %}

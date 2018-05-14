@@ -1,5 +1,14 @@
 body {
-   background-color: #f8f9fa!important;
+    background-color: #f8f9fa!important;
+    height: 100vh;
+}
+
+.welcome-container {
+    padding: 60px 15px 0;
+}
+
+.readinglist-container {
+    padding-top: 60px;
 }
 
 .top-bar {
