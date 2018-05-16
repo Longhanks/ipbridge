@@ -38,3 +38,4 @@ FLASK_APP=autoapp.py FLASK_ENV=development flask run
 ## Ideas/ToDo
 
 - Implement caching + auto syncback.
+- Tests.
