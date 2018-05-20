@@ -39,3 +39,4 @@ FLASK_APP=autoapp.py FLASK_ENV=development flask run
 
 - Implement caching + auto syncback.
 - Tests.
+- Preview pictures in readinglist.
