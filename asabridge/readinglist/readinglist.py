@@ -18,20 +18,8 @@ DELETED_KEY = 'readinglist:deleted'
 
 def get_readinglist():
     if get_debug_flag():
-        sample_data = [{
-            'title': 'Google',
-            'URLString': 'https://www.google.com/',
-            'imageURL': None,
-            'DateAdded': datetime.datetime(2018, 4, 29, 0, 46, 15, 247691, tzinfo=tz.tzlocal()),
-            'PreviewText': 'Google+ Suche Bilder Maps Play YouTube News Gmail Mehr Andreas Schulz Erweiterte Suche Sprachoptionen Google angeboten in: English Werben mit GoogleUnternehmensangebote+GoogleÜber GoogleGoogle.de © 2018 - Daten'
-            }, {
-            'title': 'reddit: the front page of the internet',
-            'URLString': 'https://www.reddit.com/r/cpp/comments/8drshx/c_templates_revised_nicolai_josuttis_accu_2018/',
-            'imageURL': 'https://i.ytimg.com/vi/9PFMllbyaLM/hqdefault.jpg',
-            'DateAdded': datetime.datetime(2018, 4, 21, 12, 44, 33, 650619, tzinfo=tz.tzlocal()),
-            'PreviewText': 'Cookies help us deliver our Services. By using our Services, you agree to our use of cookies.Learn More r/cppyoutube C++ Templates Revised - Nicolai Josuttis [ACCU 2018] u/vormestrand 4 Comments14 Top Write a comment Ob'
-            }]
-        return sample_data
+        return cache.get('DEBUGDATA') or []
+
     plist = Path.home() / 'Library' / 'Safari' / 'Bookmarks.plist'
     with open(plist, 'rb') as plist_f:
         data = plistlib.load(plist_f)['Children']
@@ -108,17 +96,26 @@ def get_readinglist():
 
 
 def add_readinglist_item(url):
+    date_added = datetime.datetime.now().replace(tzinfo=tz.tzlocal())
+    rl_item = {
+        'title': url,
+        'URLString': url,
+        'imageURL': None,
+        'DateAdded': date_added,
+        'PreviewText': url
+    }
+    current_app.logger.debug('New readinglist item: { \"URLString\": \"' + url + '\", \"DateAdded\": \"' + date_added.isoformat() + '\" }')
+
     if get_debug_flag():
+        data = cache.get('DEBUGDATA') or []
+        data.append(rl_item)
+        data.sort(key=lambda rl_item: rl_item['DateAdded'], reverse=True)
+        cache.set(key='DEBUGDATA', value=data, timeout=-1)
         return
+
     js_call = 'Application("Safari").addReadingListItem("' + url + '")'
     osascript_call = ['osascript', '-l', 'JavaScript', '-e', js_call]
     subprocess.check_call(osascript_call)
-    date_added = datetime.datetime.now().replace(tzinfo=tz.tzlocal())
-    current_app.logger.debug('New readinglist item: { \"URLString\": \"' + url + '\", \"DateAdded\": \"' + date_added.isoformat() + '\" }')
-    rl_item = {
-        'URLString': url,
-        'DateAdded': date_added
-    }
     unsaved = cache.get(key=UNSAVED_KEY) or []
     unsaved.append(rl_item)
     cache.set(key=UNSAVED_KEY, value=unsaved, timeout=120)
@@ -126,11 +123,15 @@ def add_readinglist_item(url):
 
 def delete_readinglist_item(index):
     if get_debug_flag():
+        data = cache.get('DEBUGDATA') or []
+        data.pop(int(index))
+        cache.set(key='DEBUGDATA', value=data, timeout=-1)
         return
+
+    item = get_readinglist()[int(index)]
     osascript_call = ['osascript', '-l', 'JavaScript', current_app.root_path + '/static/remove_readinglist.js', str(index)]
     thread = threading.Thread(target=subprocess.check_call, args=(osascript_call,))
     thread.start()
-    item = get_readinglist()[int(index)]
     deleted = cache.get(key=UNSAVED_KEY) or []
     deleted.append(item)
     cache.set(key=DELETED_KEY, value=deleted, timeout=120)

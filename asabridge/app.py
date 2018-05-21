@@ -4,8 +4,8 @@ import os
 from flask import Flask
 from flask.helpers import get_debug_flag
 
-from asabridge import index, login, logs, readinglist
-from asabridge.extensions import cache, login_manager
+from asabridge import debug, index, login, logs, readinglist
+from asabridge.extensions import cache, cache_config, login_manager
 from asabridge.user import User
 
 
@@ -26,7 +26,10 @@ def create_app():
 
 def register_extensions(app):
     """Register Flask extensions."""
-    cache.init_app(app)
+    if app.debug:
+        app.logger.debug('Using CACHE_KEY_PREFIX=debug:adabridge-cache:')
+        cache_config['CACHE_KEY_PREFIX'] = 'debug:adabridge-cache:'
+    cache.init_app(app, config=cache_config)
     login_manager.init_app(app)
     login_manager.login_view = 'login.login'
     login_manager.login_message = None
@@ -35,6 +38,8 @@ def register_extensions(app):
 
 def register_blueprints(app):
     """Register Flask blueprints."""
+    if app.debug:
+        app.register_blueprint(debug.views.blueprint)
     app.register_blueprint(index.views.blueprint)
     app.register_blueprint(login.views.blueprint)
     app.register_blueprint(logs.views.blueprint)
