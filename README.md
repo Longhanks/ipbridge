@@ -36,6 +36,6 @@ FLASK_APP=autoapp.py FLASK_ENV=development flask run
 
 ## Ideas/ToDo
 
-- Implement caching + auto syncback.
 - Tests.
 - Preview pictures in readinglist.
+- Move debug data to redis + a separate REST "reset" call.

@@ -4,7 +4,7 @@ import datetime
 import plistlib
 from pathlib import Path
 import subprocess
-import time
+import threading
 from dateutil import tz
 
 from flask import current_app
@@ -80,6 +80,30 @@ def get_readinglist():
 
     pythonic_readinglist.sort(key=lambda rl_item: rl_item['DateAdded'], reverse=True)
 
+    # Now remove the items that are marked as deleted.
+    deleted = cache.get(DELETED_KEY) or []
+    deletion_finished_indices = []
+    for deleted_item_index, deleted_item in enumerate(deleted):
+        rl_index = None
+        for index, rl_item in enumerate(pythonic_readinglist):
+            delta = abs((rl_item['DateAdded'] - deleted_item['DateAdded']).total_seconds())
+            rl_url = rl_item['URLString']
+            my_url = deleted_item['URLString']
+            if rl_url in (my_url, my_url + '/') and delta <= 1.5:
+                rl_index = index
+                break
+        if rl_index is not None:
+            pythonic_readinglist.pop(rl_index)
+        else:
+            deletion_finished_indices.append(deleted_item_index)
+
+    # Remove the deleted items form the list that the readinglist finished deleting.
+    for index in deletion_finished_indices:
+        deleted.pop(index)
+
+    # Save cache updates.
+    cache.set(key=DELETED_KEY, value=deleted, timeout=120)
+
     return pythonic_readinglist
 
 
@@ -104,5 +128,9 @@ def delete_readinglist_item(index):
     if get_debug_flag():
         return
     osascript_call = ['osascript', '-l', 'JavaScript', current_app.root_path + '/static/remove_readinglist.js', str(index)]
-    subprocess.check_call(osascript_call)
-    time.sleep(3)
+    thread = threading.Thread(target=subprocess.check_call, args=(osascript_call,))
+    thread.start()
+    item = get_readinglist()[int(index)]
+    deleted = cache.get(key=UNSAVED_KEY) or []
+    deleted.append(item)
+    cache.set(key=DELETED_KEY, value=deleted, timeout=120)
