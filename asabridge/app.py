@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import os
 from flask import Flask
 from flask.helpers import get_debug_flag
 
@@ -10,14 +11,16 @@ from asabridge.user import User
 
 def create_app():
     app = Flask(__name__.split('.')[0])
-    if __name__ != '__main__' and not get_debug_flag():
-        gunicorn_logger = logging.getLogger('gunicorn.error')
-        app.logger.handlers = gunicorn_logger.handlers
-        app.logger.setLevel(gunicorn_logger.level)
-    # Change me!
-    app.secret_key = b'Z\xb2\xb7S\xd9D\xe7\x05\xc7\r\xf2dR\xd9\xe9n'
-    register_extensions(app)
-    register_blueprints(app)
+    if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        if __name__ != '__main__' and not get_debug_flag():
+            gunicorn_logger = logging.getLogger('gunicorn.error')
+            app.logger.handlers = gunicorn_logger.handlers
+            app.logger.setLevel(gunicorn_logger.level)
+        # Change me!
+        app.secret_key = b'Z\xb2\xb7S\xd9D\xe7\x05\xc7\r\xf2dR\xd9\xe9n'
+        register_extensions(app)
+        register_blueprints(app)
+        app.logger.debug('Finished app initialization.')
     return app
 
 
