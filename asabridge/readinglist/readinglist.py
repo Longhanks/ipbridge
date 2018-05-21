@@ -10,6 +10,11 @@ from dateutil import tz
 from flask import current_app
 from flask.helpers import get_debug_flag
 
+from asabridge.extensions import cache
+
+UNSAVED_KEY = 'readinglist:unsaved'
+DELETED_KEY = 'readinglist:deleted'
+
 
 def get_readinglist():
     if get_debug_flag():
@@ -42,6 +47,39 @@ def get_readinglist():
                                      }
         pythonic_readinglist_item['PreviewText'] = item['ReadingList'].get('PreviewText') or pythonic_readinglist_item['title']
         pythonic_readinglist.append(pythonic_readinglist_item)
+
+    # The cache of unsaved readinglist items.
+    unsaved = cache.get(UNSAVED_KEY) or []
+
+    # First, check if unsaved items are now part of the readinglist and remove them from the unsaved list, if so.
+    for rl_item in pythonic_readinglist:
+        unsaved_index = None
+        for index, item in enumerate(unsaved):
+            delta = abs((rl_item['DateAdded'] - item['DateAdded']).total_seconds())
+            rl_url = rl_item['URLString']
+            my_url = item['URLString']
+            if rl_url in (my_url, my_url + '/') and delta <= 1.5:
+                unsaved_index = index
+                break
+        if unsaved_index is not None:
+            unsaved.pop(unsaved_index)
+
+    # Save cache updates.
+    cache.set(key=UNSAVED_KEY, value=unsaved, timeout=120)
+
+    # Now add the remaining items from the unsaved list to the readinglist.
+    for item in unsaved:
+        item_dict = {
+            'title': item['URLString'],
+            'URLString': item['URLString'],
+            'imageURL': None,
+            'DateAdded': item['DateAdded'],
+            'PreviewText': item['URLString']
+            }
+        pythonic_readinglist.append(item_dict)
+
+    pythonic_readinglist.sort(key=lambda rl_item: rl_item['DateAdded'], reverse=True)
+
     return pythonic_readinglist
 
 
@@ -51,7 +89,15 @@ def add_readinglist_item(url):
     js_call = 'Application("Safari").addReadingListItem("' + url + '")'
     osascript_call = ['osascript', '-l', 'JavaScript', '-e', js_call]
     subprocess.check_call(osascript_call)
-    time.sleep(3)
+    date_added = datetime.datetime.now().replace(tzinfo=tz.tzlocal())
+    current_app.logger.debug('New readinglist item: { \"URLString\": \"' + url + '\", \"DateAdded\": \"' + date_added.isoformat() + '\" }')
+    rl_item = {
+        'URLString': url,
+        'DateAdded': date_added
+    }
+    unsaved = cache.get(key=UNSAVED_KEY) or []
+    unsaved.append(rl_item)
+    cache.set(key=UNSAVED_KEY, value=unsaved, timeout=120)
 
 
 def delete_readinglist_item(index):
