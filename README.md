@@ -5,7 +5,6 @@ Web access to local macOS services.
 ## Requirements
 
 - Python 3.4 or newer
-- [cliclick](https://www.bluem.net/de/projekte/cliclick/ "cliclick")
 - [redis](https://redis.io "redis")
 
 ## Installation
