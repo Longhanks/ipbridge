@@ -10,7 +10,7 @@
             <div class="collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="#">Reading list <span class="sr-only">(current)</span></a>
+                        <a class="nav-link" href="javascript:window.location.reload(true)">Reading list <span class="sr-only">(current)</span></a>
                     </li>
                 </ul>
                 <ul class="navbar-nav mt-2 mt-md-0">
@@ -25,7 +25,7 @@
         </nav>
     </div>
     <div class="readinglist-container container">
-        <form class="needs-validation" action="{{ url_for('readinglist.add_readinglist_item') }}" method=post novalidate>
+        <form id="addReadinglistItemForm" class="needs-validation" action="{{ url_for('readinglist.add_readinglist_item') }}" method=POST novalidate>
             <div class="form-group form-group-sm">
                 <input type="url" name="url" class="form-control" id="urlInput" placeholder="Enter link" required>
                 <div class="invalid-feedback">
@@ -60,23 +60,18 @@
         </div>
     </div>
     <script>
-        // Example starter JavaScript for disabling form submissions if there are invalid fields
-        (function () {
-            'use strict';
-            window.addEventListener('load', function () {
-                // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                var forms = document.getElementsByClassName('needs-validation');
-                // Loop over them and prevent submission
-                var validation = Array.prototype.filter.call(forms, function (form) {
-                    form.addEventListener('submit', function (event) {
-                        if (form.checkValidity() === false) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                        }
-                        form.classList.add('was-validated');
-                    }, false);
-                });
-            }, false);
-        })();
+        'use strict';
+        let urlInput = document.getElementById('urlInput');
+        urlInput.addEventListener('input', function() {
+            urlInput.classList.remove('is-invalid');
+        }, false);
+        let form = document.getElementById('addReadinglistItemForm');
+        form.addEventListener('submit', function (event) {
+            if (!urlInput.checkValidity()) {
+                urlInput.classList.add("is-invalid");
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        }, false);
     </script>
 {% endblock %}
