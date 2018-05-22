@@ -37,4 +37,3 @@ FLASK_APP=autoapp.py FLASK_ENV=development flask run
 ## Ideas/ToDo
 
 - Tests.
-- Preview pictures in readinglist.

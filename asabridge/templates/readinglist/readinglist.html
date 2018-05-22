@@ -41,12 +41,11 @@
             {% for entry in entries %}
                 <a href={{ entry.URLString }} class="rl-item list-group-item list-group-item-action">
                     <div class="rl-item-content">
-                        <div class="rl-img-container">
-                            {% if entry.imageURL %}
-                                <img src="{{ entry.imageURL }}" class="mx-auto rl-img">
-                            {% else %}
-                                <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="rl-img">
-                            {% endif %}
+                        {% if entry.imageURL %}
+                        <div class="rl-img-container" style="background-image: url('{{ entry.imageURL }}');">
+                        {% else %}
+                        <div class="rl-img-container" style="background-image: url('data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');">
+                        {% endif %}
                         </div>
                         <div class="rl-item-textual-content">
                             <div class="d-flex w-100 justify-content-between">
