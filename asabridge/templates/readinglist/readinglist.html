@@ -41,19 +41,28 @@
             {% for entry in entries %}
                 <a href={{ entry.URLString }} class="rl-item list-group-item list-group-item-action">
                     <div class="rl-item-content">
-                        <div class="d-flex w-100 justify-content-between">
-                            <p class="mb-1">{{ entry.title }}</p>
-                            <small class="text-muted">{{ entry.DateAdded }}</small>
+                        <div class="rl-img-container">
+                            {% if entry.imageURL %}
+                                <img src="{{ entry.imageURL }}" class="mx-auto rl-img">
+                            {% else %}
+                                <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="rl-img">
+                            {% endif %}
                         </div>
-                    <div class="rl-preview-container">
-                        <small class="text-muted">{{ entry.PreviewText }}</small>
-                        <div class="rl-item-delete">
-                            <form action="{{ url_for('readinglist.delete_readinglist_item') }}" method=post novalidate>
-                                <input type="hidden" name="index" value="{{ loop.index0 }}" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                            </form>
+                        <div class="rl-item-textual-content">
+                            <div class="d-flex w-100 justify-content-between">
+                                <p class="mb-1">{{ entry.title }}</p>
+                                <small class="text-muted">{{ entry.DateAdded }}</small>
+                            </div>
+                            <div class="rl-preview-container">
+                                <small class="text-muted">{{ entry.PreviewText }}</small>
+                                <div class="rl-item-delete">
+                                    <form action="{{ url_for('readinglist.delete_readinglist_item') }}" method=post novalidate>
+                                        <input type="hidden" name="index" value="{{ loop.index0 }}" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                    </div>
                     </div>
                 </a>
             {% endfor %}
