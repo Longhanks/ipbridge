@@ -35,14 +35,15 @@ def login():
     elif request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        remember_me = request.form.get('remember_me') == 'on' or False
         next_link = request.args.get('next')
-        current_app.logger.debug('Trying to log in as ' + username + '...')
-        current_app.logger.debug('next: ' + str(next_link))
+        current_app.logger.debug('Login attempt, username=' + username + ', remember=' + str(remember_me) + ', next=' + str(next_link))
         if not simplepam.authenticate(username, password):
             current_app.logger.debug('Login attempt for ' + username + ' failed.')
             session['failed_login_attempt'] = True
             return redirect(url_for('login.login', next=next_link))
-        login_user(User(username))
+        current_app.logger.debug('Login for ' + username + ' succeeded.')
+        login_user(User(username), remember=remember_me)
         if not is_safe_url(next_link):
             return url_for('index.index')
         return redirect(next_link or url_for('index.index'))
