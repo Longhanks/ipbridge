@@ -38,3 +38,4 @@ FLASK_APP=autoapp.py FLASK_ENV=development flask run
 
 - Tests.
 - Preview pictures in readinglist.
+- Implement "remember me" functionality on login page.
