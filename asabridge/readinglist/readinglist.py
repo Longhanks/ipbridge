@@ -3,17 +3,30 @@
 import datetime
 import plistlib
 from pathlib import Path
+from urllib import parse, request
 import subprocess
 import threading
 from dateutil import tz
 
-from flask import current_app
+from flask import current_app, url_for
 from flask.helpers import get_debug_flag
 
 from asabridge.extensions import cache
 
 UNSAVED_KEY = 'readinglist:unsaved'
 DELETED_KEY = 'readinglist:deleted'
+
+
+def get_cached_image(image_url):
+    if image_url is None:
+        return None
+    name = Path('/tmp/asabridge') / parse.quote_plus(image_url)
+    if not name.exists():
+        current_app.logger.debug('Downloading ' + image_url + ' to save it for later.')
+        request.urlretrieve(url=image_url, filename=name)
+    abs_url = url_for('imagecache/' + name, _external=True)
+    current_app.logger.debug('Redirecting image request to ' + abs_url)
+    return abs_url
 
 
 def get_readinglist():
@@ -30,7 +43,7 @@ def get_readinglist():
     for item in readinglist_elements:
         pythonic_readinglist_item = {'title': item['URIDictionary']['title'],
                                      'URLString': item['URLString'],
-                                     'imageURL': item.get('imageURL'),
+                                     'imageURL': get_cached_image(item.get('imageURL')),
                                      'DateAdded': item['ReadingList']['DateAdded'].replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal())
                                      }
         pythonic_readinglist_item['PreviewText'] = item['ReadingList'].get('PreviewText') or pythonic_readinglist_item['title']
