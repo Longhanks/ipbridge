@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # system imports.
 import datetime
+import hashlib
 import plistlib
 from pathlib import Path
 from urllib import parse, request
@@ -8,7 +9,7 @@ import subprocess
 import threading
 from dateutil import tz
 
-from flask import current_app, url_for
+from flask import current_app
 from flask.helpers import get_debug_flag
 
 from asabridge.extensions import cache
@@ -18,18 +19,18 @@ DELETED_KEY = 'readinglist:deleted'
 
 
 def get_cached_image(image_url):
-    quoted_url = parse.quote_plus(image_url)
     if image_url is None:
         return None
+    file_name = hashlib.sha512('image_url'.encode()).hexdigest()
     tmp_path = Path('/tmp') / 'asabridge'
     if not tmp_path.exists():
         tmp_path.mkdir()
-    name = tmp_path / quoted_url
-    if not name.exists():
+    abs_path = tmp_path / file_name
+    if not abs_path.exists():
         current_app.logger.debug('Downloading ' + image_url + ' to save it for later.')
-        request.urlretrieve(url=image_url, filename=name)
-    abs_url = '/imagecache/' + quoted_url
-    current_app.logger.debug('Redirecting image request to ' + quoted_url)
+        request.urlretrieve(url=image_url, filename=abs_path)
+    abs_url = '/imagecache/' + file_name
+    current_app.logger.debug('Rewriting image url to ' + abs_url)
     return abs_url
 
 
