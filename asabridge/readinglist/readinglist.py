@@ -20,7 +20,7 @@ DELETED_KEY = 'readinglist:deleted'
 def get_cached_image(image_url):
     if image_url is None:
         return None
-    tmp_path = Path('/') / 'asabridge'
+    tmp_path = Path('/tmp') / 'asabridge'
     if not tmp_path.exists():
         tmp_path.mkdir()
     name = tmp_path / parse.quote_plus(image_url)
