@@ -21,7 +21,7 @@ DELETED_KEY = 'readinglist:deleted'
 def get_cached_image(image_url):
     if image_url is None:
         return None
-    file_name = hashlib.sha512('image_url'.encode()).hexdigest()
+    file_name = hashlib.sha512(image_url.encode()).hexdigest()
     tmp_path = Path('/tmp') / 'asabridge' / 'imagecache'
     if not tmp_path.exists():
         tmp_path.mkdir(parents=True)
