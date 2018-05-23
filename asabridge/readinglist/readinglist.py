@@ -20,11 +20,14 @@ DELETED_KEY = 'readinglist:deleted'
 def get_cached_image(image_url):
     if image_url is None:
         return None
-    name = Path('/tmp/asabridge') / parse.quote_plus(image_url)
+    tmp_path = Path('/') / 'asabridge'
+    if not tmp_path.exists():
+        tmp_path.mkdir()
+    name = tmp_path / parse.quote_plus(image_url)
     if not name.exists():
         current_app.logger.debug('Downloading ' + image_url + ' to save it for later.')
         request.urlretrieve(url=image_url, filename=name)
-    abs_url = url_for('imagecache/' + name, _external=True)
+    abs_url = url_for('imagecache/' + str(name), _external=True)
     current_app.logger.debug('Redirecting image request to ' + abs_url)
     return abs_url
 
