@@ -18,17 +18,18 @@ DELETED_KEY = 'readinglist:deleted'
 
 
 def get_cached_image(image_url):
+    quoted_url = parse.quote_plus(image_url)
     if image_url is None:
         return None
     tmp_path = Path('/tmp') / 'asabridge'
     if not tmp_path.exists():
         tmp_path.mkdir()
-    name = tmp_path / parse.quote_plus(image_url)
+    name = tmp_path / quoted_url
     if not name.exists():
         current_app.logger.debug('Downloading ' + image_url + ' to save it for later.')
         request.urlretrieve(url=image_url, filename=name)
-    abs_url = '/imagecache/' + str(image_url)
-    current_app.logger.debug('Redirecting image request to ' + abs_url)
+    abs_url = '/imagecache/' + quoted_url
+    current_app.logger.debug('Redirecting image request to ' + quoted_url)
     return abs_url
 
 
