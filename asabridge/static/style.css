@@ -86,7 +86,9 @@ body {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    justify-content: space-around;
+    justify-content: space-between;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .rl-preview-container {
