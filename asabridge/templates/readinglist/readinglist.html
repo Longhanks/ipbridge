@@ -48,12 +48,12 @@
                         {% endif %}
                         </div>
                         <div class="rl-item-textual-content">
-                            <div class="d-flex w-100 justify-content-between">
-                                <p class="mb-1">{{ entry.title }}</p>
-                                <small class="text-muted">{{ entry.DateAdded }}</small>
+                            <div class="rl-item-header">
+                                {{ entry.title }}
+                                <div class="rl-item-small-text text-muted">{{ entry.DateAdded }}</div>
                             </div>
                             <div class="rl-preview-container">
-                                <small class="text-muted">{{ entry.PreviewText }}</small>
+                                <div class="rl-item-small-text text-muted">{{ entry.PreviewText }}</div>
                                 <div class="rl-item-delete">
                                     <form action="{{ url_for('readinglist.delete_readinglist_item') }}" method=post novalidate>
                                         <input type="hidden" name="index" value="{{ loop.index0 }}" />
