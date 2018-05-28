@@ -2,7 +2,9 @@
 from flask_caching import Cache
 from flask_login import LoginManager
 
-cache_config = {
+from typing import Dict
+
+cache_config: Dict[str, str] = {
     'CACHE_TYPE': 'redis',
     'CACHE_KEY_PREFIX': 'adabridge-cache:',
     'CACHE_REDIS_HOST': 'localhost',

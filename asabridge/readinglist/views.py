@@ -29,7 +29,13 @@ def add_readinglist_item():
 @blueprint.route('/readinglist/delete', methods=['POST'])
 @login_required
 def delete_readinglist_item():
-    index = request.form['index'] or -1
+    index = request.form['index']
+    try:
+        index = int(index)
+        if not index >= 0:
+            raise ValueError('Index must be >= 0')
+    except (TypeError, ValueError):
+        abort(400, f'Invalid index: {index}')
     readinglist.delete_readinglist_item(index)
     return redirect(url_for('readinglist.get_readinglist_items'))
 
@@ -39,6 +45,6 @@ def delete_readinglist_item():
 def get_readinglist_items():
     entries = readinglist.get_readinglist()
     for entry in entries:
-        date = datetime.datetime.now(tz.tzlocal()) - entry['DateAdded']
-        entry['DateAdded'] = humanize.naturaltime(date)
+        delta_date = datetime.datetime.now(tz.tzlocal()) - entry.date
+        entry.date = humanize.naturaltime(delta_date)
     return render_template('readinglist/readinglist.html', entries=entries)

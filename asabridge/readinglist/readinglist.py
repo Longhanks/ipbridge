@@ -1,24 +1,25 @@
 # -*- coding: utf-8 -*-
-# system imports.
 import datetime
 import hashlib
 import plistlib
 from pathlib import Path
-from urllib import parse, request
+from urllib import request
 import subprocess
 import threading
 from dateutil import tz
+from typing import Optional, List
 
 from flask import current_app
 from flask.helpers import get_debug_flag
 
 from asabridge.extensions import cache
+from .readinglist_item import ReadinglistItem
 
 UNSAVED_KEY = 'readinglist:unsaved'
 DELETED_KEY = 'readinglist:deleted'
 
 
-def get_cached_image(image_url):
+def get_cached_image(image_url: Optional[str]) -> Optional[str]:
     if image_url is None:
         return None
     file_name = hashlib.sha512(image_url.encode()).hexdigest()
@@ -27,14 +28,14 @@ def get_cached_image(image_url):
         tmp_path.mkdir(parents=True)
     abs_path = tmp_path / file_name
     if not abs_path.exists():
-        current_app.logger.debug('Downloading ' + image_url + ' to save it for later.')
+        current_app.logger.debug(f'Downloading {image_url} to save it for later.')
         request.urlretrieve(url=image_url, filename=abs_path)
     abs_url = '/imagecache/' + file_name
-    current_app.logger.debug('Rewriting image url to ' + abs_url)
+    current_app.logger.debug(f'Rewriting image url to {abs_url}')
     return abs_url
 
 
-def get_readinglist():
+def get_readinglist() -> List[ReadinglistItem]:
     if get_debug_flag():
         return cache.get('DEBUGDATA') or []
 
@@ -44,27 +45,25 @@ def get_readinglist():
 
     readinglist = [e for e in data if e.get('Title') == 'com.apple.ReadingList'][0]
     readinglist_elements = readinglist.get('Children') or []
-    pythonic_readinglist = []
+    pythonic_readinglist: List[ReadinglistItem] = []
     for item in readinglist_elements:
-        pythonic_readinglist_item = {'title': item['URIDictionary']['title'],
-                                     'URLString': item['URLString'],
-                                     'imageURL': get_cached_image(item.get('imageURL')),
-                                     'DateAdded': item['ReadingList']['DateAdded'].replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal())
-                                     }
-        pythonic_readinglist_item['PreviewText'] = item['ReadingList'].get('PreviewText') or pythonic_readinglist_item['title']
-        pythonic_readinglist.append(pythonic_readinglist_item)
+        title = item['URIDictionary']['title']
+        url = item['URLString']
+        image_url = get_cached_image(item.get('imageURL'))
+        date: datetime = item['ReadingList']['DateAdded'].replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal())
+        preview = item['ReadingList'].get('PreviewText')
+        rl_item = ReadinglistItem(title=title, url=url, image_url=image_url, date=date, preview=preview)
+        pythonic_readinglist.append(rl_item)
 
     # The cache of unsaved readinglist items.
-    unsaved = cache.get(UNSAVED_KEY) or []
+    unsaved: List[ReadinglistItem] = cache.get(UNSAVED_KEY) or []
 
     # First, check if unsaved items are now part of the readinglist and remove them from the unsaved list, if so.
     for rl_item in pythonic_readinglist:
         unsaved_index = None
         for index, item in enumerate(unsaved):
-            delta = abs((rl_item['DateAdded'] - item['DateAdded']).total_seconds())
-            rl_url = rl_item['URLString']
-            my_url = item['URLString']
-            if rl_url in (my_url, my_url + '/') and delta <= 1.5:
+            delta = abs((rl_item.date - item.date).total_seconds())
+            if rl_item.url in (item.url, item.url + '/') and delta <= 1.5:
                 unsaved_index = index
                 break
         if unsaved_index is not None:
@@ -74,28 +73,17 @@ def get_readinglist():
     cache.set(key=UNSAVED_KEY, value=unsaved, timeout=120)
 
     # Now add the remaining items from the unsaved list to the readinglist.
-    for item in unsaved:
-        item_dict = {
-            'title': item['URLString'],
-            'URLString': item['URLString'],
-            'imageURL': None,
-            'DateAdded': item['DateAdded'],
-            'PreviewText': item['URLString']
-            }
-        pythonic_readinglist.append(item_dict)
-
-    pythonic_readinglist.sort(key=lambda rl_item: rl_item['DateAdded'], reverse=True)
+    pythonic_readinglist += unsaved
+    pythonic_readinglist.sort(key=lambda rl_item: rl_item.date, reverse=True)
 
     # Now remove the items that are marked as deleted.
-    deleted = cache.get(DELETED_KEY) or []
+    deleted: List[ReadinglistItem] = cache.get(DELETED_KEY) or []
     deletion_finished_indices = []
     for deleted_item_index, deleted_item in enumerate(deleted):
         rl_index = None
         for index, rl_item in enumerate(pythonic_readinglist):
-            delta = abs((rl_item['DateAdded'] - deleted_item['DateAdded']).total_seconds())
-            rl_url = rl_item['URLString']
-            my_url = deleted_item['URLString']
-            if rl_url in (my_url, my_url + '/') and delta <= 1.5:
+            delta = abs((rl_item.date - deleted_item.date).total_seconds())
+            if rl_item.url in (deleted_item.url, deleted_item.url + '/') and delta <= 1.5:
                 rl_index = index
                 break
         if rl_index is not None:
@@ -113,43 +101,38 @@ def get_readinglist():
     return pythonic_readinglist
 
 
-def add_readinglist_item(url):
+def add_readinglist_item(url: str):
     date_added = datetime.datetime.now().replace(tzinfo=tz.tzlocal())
-    rl_item = {
-        'title': url,
-        'URLString': url,
-        'imageURL': None,
-        'DateAdded': date_added,
-        'PreviewText': url
-    }
-    current_app.logger.debug('New readinglist item: { \"URLString\": \"' + url + '\", \"DateAdded\": \"' + date_added.isoformat() + '\" }')
+    rl_item = ReadinglistItem(title=url, url=url, image_url=None, date=date_added, preview=url)
+    current_app.logger.debug(f'New readinglist item: {{ "URLString ": "{url}", "DateAdded": "{date_added.isoformat()}" }}')
 
     if get_debug_flag():
-        data = cache.get('DEBUGDATA') or []
+        data: List[ReadinglistItem] = cache.get('DEBUGDATA') or []
         data.append(rl_item)
-        data.sort(key=lambda rl_item: rl_item['DateAdded'], reverse=True)
+        data.sort(key=lambda rl_item: rl_item.date, reverse=True)
         cache.set(key='DEBUGDATA', value=data, timeout=-1)
         return
 
     js_call = 'Application("Safari").addReadingListItem("' + url + '")'
     osascript_call = ['osascript', '-l', 'JavaScript', '-e', js_call]
     subprocess.check_call(osascript_call)
-    unsaved = cache.get(key=UNSAVED_KEY) or []
+    unsaved: List[ReadinglistItem] = cache.get(key=UNSAVED_KEY) or []
     unsaved.append(rl_item)
     cache.set(key=UNSAVED_KEY, value=unsaved, timeout=120)
 
 
-def delete_readinglist_item(index):
+def delete_readinglist_item(index: int):
+    current_app.logger.debug(f'Attempting to delete item at index {index}')
     if get_debug_flag():
-        data = cache.get('DEBUGDATA') or []
-        data.pop(int(index))
+        data: List[ReadinglistItem] = cache.get('DEBUGDATA') or []
+        data.pop(index)
         cache.set(key='DEBUGDATA', value=data, timeout=-1)
         return
 
-    item = get_readinglist()[int(index)]
+    item: ReadinglistItem = get_readinglist()[index]
     osascript_call = ['osascript', '-l', 'JavaScript', current_app.root_path + '/static/remove_readinglist.js', str(index)]
     thread = threading.Thread(target=subprocess.check_call, args=(osascript_call,))
     thread.start()
-    deleted = cache.get(key=UNSAVED_KEY) or []
+    deleted: List[ReadinglistItem] = cache.get(key=UNSAVED_KEY) or []
     deleted.append(item)
     cache.set(key=DELETED_KEY, value=deleted, timeout=120)

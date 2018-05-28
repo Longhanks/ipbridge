@@ -9,7 +9,7 @@ from asabridge.extensions import cache, cache_config, login_manager
 from asabridge.user import User
 
 
-def create_app():
+def create_app() -> Flask:
     app = Flask(__name__.split('.')[0])
     if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         if __name__ != '__main__' and not get_debug_flag():
