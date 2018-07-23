@@ -4,6 +4,7 @@ import hashlib
 import plistlib
 from pathlib import Path
 from urllib import request
+from urllib.error import HTTPError
 import subprocess
 import threading
 from dateutil import tz
@@ -29,7 +30,11 @@ def get_cached_image(image_url: Optional[str]) -> Optional[str]:
     abs_path = tmp_path / file_name
     if not abs_path.exists():
         current_app.logger.debug(f'Downloading {image_url} to save it for later.')
-        request.urlretrieve(url=image_url, filename=abs_path)
+        try:
+            request.urlretrieve(url=image_url, filename=abs_path)
+        except HTTPError as e:
+            current_app.logger.debug(f'Downloading {image_url} failed! Error: {e}')
+            return None
     abs_url = '/imagecache/' + file_name
     current_app.logger.debug(f'Rewriting image url to {abs_url}')
     return abs_url
