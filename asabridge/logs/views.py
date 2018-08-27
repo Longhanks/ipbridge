@@ -1,16 +1,39 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, current_app, redirect, url_for
+from flask import Blueprint, render_template, Response, stream_with_context, current_app
 from flask_login import login_required
 
+from pathlib import Path
+import subprocess
+
+LOG_FILE_PATH = Path('/Users/aschulz/Projects/asabridge/log/asabridge.log')
 
 blueprint = Blueprint('logs', __name__, static_folder='../static')
+
+
+@blueprint.route('/logstream', methods=['GET'])
+@login_required
+def stream():
+    def event_stream():
+        current_app.logger.info('Launching tail.')
+        popen = subprocess.Popen(['/usr/bin/tail', '-n', '20', '-F', LOG_FILE_PATH],
+                                 stdout=subprocess.PIPE,
+                                 universal_newlines=True)
+        while True:
+            try:
+                stdout_line = popen.stdout.readline()
+                yield f'data: {stdout_line}\n'
+            except GeneratorExit as generator_exit:
+                current_app.logger.info('Stopping tail.')
+                popen.stdout.close()
+                popen.kill()
+                raise generator_exit
+            except subprocess.CalledProcessError as tail_error:
+                yield f'data: {tail_error}\n\n'
+
+    return Response(stream_with_context(event_stream()), mimetype='text/event-stream')
 
 
 @blueprint.route('/logs', methods=['GET'])
 @login_required
 def logs():
-    logs_abs_url = str(url_for('logs.logs', _external=True))
-    root_url = logs_abs_url[:-len('/logs')]
-    rtail_url = root_url.replace('12137', '12139')
-    current_app.logger.debug(f'constructed {rtail_url}')
-    return redirect(rtail_url)
+    return render_template('logs/logs.html')

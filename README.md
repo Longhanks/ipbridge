@@ -20,19 +20,19 @@ For example, use [tccutil](https://github.com/jacobsalmela/tccutil "tccutil").
 
 ## Running
 
-### Dev
+### Development
 
 ```bash
-FLASK_APP=autoapp.py FLASK_ENV=development flask run
+FLASK_APP=autoapp.py FLASK_ENV=development python3 -m flask run
 ```
 
 ### Production
 
-- LaunchAgents: Change working directory from /Users/aschulz/Projects/asabridge to somwhere else.
-- Use the LaunchAgents to start asabridge at port 12136 and a log tailer that pipes to rtail.
+- LaunchAgent: Change working directory from /Users/aschulz/Projects/asabridge to somwhere else.
+- Also change the `LOG_FILE_PATH` in `asabridge/logs/views.py` to fit what's in the LaunchAgent as stdout file path.
+- Use the LaunchAgent to start asabridge at port 12136.
 - nginx conf: Add domain name and SSL certificate + key. Provides a reverse proxy from 12137 to asabridge.
 - Take a look at the LaunchAgent plist to see the gunicorn flags.
-- Run [rtail-server](https://github.com/Longhanks/rtail-server "rtail-server") at 12138 (reverse proxy 12139).
 
 ## Ideas/ToDo
 

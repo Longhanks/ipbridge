@@ -16,6 +16,8 @@
             <string>127.0.0.1:12136</string>
             <string>--log-level</string>
             <string>debug</string>
+            <string>--worker-class</string>
+            <string>gevent</string>
             <string>autoapp</string>
         </array>        
         <key>StandardOutPath</key>
