@@ -36,25 +36,66 @@
                 full_log += log.childNodes[i].textContent;
             }
             if (full_log.indexOf(new_log) === -1) {
+                // Is a new line.
+
                 let bracket_regex = /\s*(\[[a-zA-Z0-9]*\])\s*/g;
                 var split = new_log.split(bracket_regex).filter(Boolean);
-                if (split.length === 4) {
-                    // gunicorn logger message.
-                    var timestamp_span = document.createElement('span');
-                    timestamp_span.textContent = split[0] + " ";
-                    var pid_span = document.createElement('span');
-                    pid_span.textContent = split[1] + " ";
-                    var log_level_span = document.createElement('span');
-                    log_level_span.textContent = split[2] + " ";
-                    log_level_span.style.color = "red";
-                    var msg_span = document.createElement('span');
-                    msg_span.textContent = split[3];
-                    log.appendChild(timestamp_span);
-                    log.appendChild(pid_span);
-                    log.appendChild(log_level_span);
-                    log.appendChild(msg_span);
+
+                if (split.length >= 4) {
+                    // might be gunicorn logger message.
+
+                    // Sample date: [2018-08-28 04:29:10 +0200]
+                    if (split[0].length == 27) {
+                        var isodate = split[0].substring(1, 11) + "T";
+                        isodate += split[0].substring(12, 20);
+                        isodate += split[0].substring(21, 24);
+                        isodate += ":" + split[0].substring(24, 26);
+                        var timestamp = Date.parse(isodate);
+                        if (isNaN(timestamp) === false) {
+                            var timestamp_span = document.createElement('span');
+                            timestamp_span.textContent = split[0] + " ";
+                            timestamp_span.style.color = "#8e908c";
+                            var pid_span = document.createElement('span');
+                            pid_span.textContent = split[1] + " ";
+                            pid_span.style.color = "#8e908c";
+                            var log_level_span = document.createElement('span');
+                            log_level_span.textContent = split[2] + " ";
+                            if (split[2] === "[DEBUG]") {
+                                log_level_span.style.color = "#4271ae";
+                            }
+                            else if (split[2] === "[INFO]") {
+                                log_level_span.style.color = "#718c00";
+                            }
+                            else if (split[2] === "[WARNING]") {
+                                log_level_span.style.color = "#eab700";
+                            }
+                            else if (split[2] === "[ERROR]") {
+                                log_level_span.style.color = "#c82829";
+                            }
+                            else if (split[2] === "[CRITICAL]") {
+                                log_level_span.style.color = "#c82829";
+                            }
+                            let drop_length = (timestamp_span.textContent + pid_span.textContent + log_level_span.textContent).length;
+                            var msg_span = document.createElement('span');
+                            msg_span.textContent = new_log.substring(drop_length);
+                            log.appendChild(timestamp_span);
+                            log.appendChild(pid_span);
+                            log.appendChild(log_level_span);
+                            log.appendChild(msg_span);
+                        } else {
+                            var msg_span = document.createElement('span');
+                            msg_span.textContent = new_log;
+                            log.appendChild(msg_span);
+                        }
+                    } else {
+                        var msg_span = document.createElement('span');
+                        msg_span.textContent = new_log;
+                        log.appendChild(msg_span);
+                    }
                 } else {
-                    log.textContent += new_log;
+                    var msg_span = document.createElement('span');
+                    msg_span.textContent = new_log;
+                    log.appendChild(msg_span);
                 }
             }
             $('html, body').scrollTop($(document).height());
