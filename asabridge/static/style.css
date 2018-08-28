@@ -114,6 +114,6 @@ body {
     font-size: 12px;
     line-height: 20px;
     margin: 10px 5px 5px;
-    white-space: pre-line;
+    white-space: pre-wrap;
     word-break: break-all;
 }

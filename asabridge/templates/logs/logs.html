@@ -30,9 +30,32 @@
         let source = new EventSource('/logstream');
         source.onmessage = function(event) {
             let new_log = event.data + "\n";
-            let paragraph = document.getElementById("log-text");
-            if (paragraph.textContent.indexOf(new_log) === -1) {
-                paragraph.textContent += new_log
+            let log = document.getElementById("log-text");
+            var full_log = log.textContent;
+            for (var i = 0; i < log.childNodes; ++i) {
+                full_log += log.childNodes[i].textContent;
+            }
+            if (full_log.indexOf(new_log) === -1) {
+                let bracket_regex = /\s*(\[[a-zA-Z0-9]*\])\s*/g;
+                var split = new_log.split(bracket_regex).filter(Boolean);
+                if (split.length === 4) {
+                    // gunicorn logger message.
+                    var timestamp_span = document.createElement('span');
+                    timestamp_span.textContent = split[0] + " ";
+                    var pid_span = document.createElement('span');
+                    pid_span.textContent = split[1] + " ";
+                    var log_level_span = document.createElement('span');
+                    log_level_span.textContent = split[2] + " ";
+                    log_level_span.style.color = "red";
+                    var msg_span = document.createElement('span');
+                    msg_span.textContent = split[3];
+                    log.appendChild(timestamp_span);
+                    log.appendChild(pid_span);
+                    log.appendChild(log_level_span);
+                    log.appendChild(msg_span);
+                } else {
+                    log.textContent += new_log;
+                }
             }
             $('html, body').scrollTop($(document).height());
         };
