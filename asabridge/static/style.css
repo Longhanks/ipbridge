@@ -107,3 +107,13 @@ body {
 .rl-item:hover .rl-item-delete {
     visibility: visible;
 }
+
+#log-text {
+    display: inline-block;
+    font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;
+    font-size: 12px;
+    line-height: 20px;
+    margin: 10px 5px 5px;
+    white-space: pre-line;
+    word-break: break-all;
+}

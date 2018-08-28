@@ -3,8 +3,6 @@ import datetime
 import hashlib
 import plistlib
 from pathlib import Path
-from urllib import request
-from urllib.error import HTTPError
 import subprocess
 import threading
 from dateutil import tz
@@ -18,25 +16,26 @@ from .readinglist_item import ReadinglistItem
 
 UNSAVED_KEY = 'readinglist:unsaved'
 DELETED_KEY = 'readinglist:deleted'
+IMAGE_CACHE_PATH = Path('/tmp/asabridge/imagecache')
 
 
 def get_cached_image(image_url: Optional[str]) -> Optional[str]:
     if image_url is None:
         return None
     file_name = hashlib.sha512(image_url.encode()).hexdigest()
-    tmp_path = Path('/tmp') / 'asabridge' / 'imagecache'
-    if not tmp_path.exists():
-        tmp_path.mkdir(parents=True)
-    abs_path = tmp_path / file_name
+    if not IMAGE_CACHE_PATH.exists():
+        IMAGE_CACHE_PATH.mkdir(parents=True)
+    abs_path = IMAGE_CACHE_PATH / file_name
     if not abs_path.exists():
-        current_app.logger.debug(f'Downloading {image_url} to save it for later.')
+        current_app.logger.info(f'No cached image found for {image_url}.')
+        current_app.logger.info(f'Downloading {image_url} to serve it cached.')
         try:
-            request.urlretrieve(url=image_url, filename=abs_path)
-        except HTTPError as e:
-            current_app.logger.debug(f'Downloading {image_url} failed! Error: {e}')
+            subprocess.check_call(['/usr/bin/curl', '-L', image_url, '-o', abs_path])
+        except subprocess.CalledProcessError as e:
+            current_app.logger.info(f'Downloading {image_url} failed! Error: {e}')
             return None
     abs_url = '/imagecache/' + file_name
-    current_app.logger.debug(f'Rewriting image url to {abs_url}')
+    current_app.logger.info(f'Serving from cache: {image_url}')
     return abs_url
 
 
@@ -109,7 +108,8 @@ def get_readinglist() -> List[ReadinglistItem]:
 def add_readinglist_item(url: str):
     date_added = datetime.datetime.now().replace(tzinfo=tz.tzlocal())
     rl_item = ReadinglistItem(title=url, url=url, image_url=None, date=date_added, preview=url)
-    current_app.logger.debug(f'New readinglist item: {{ "URLString ": "{url}", "DateAdded": "{date_added.isoformat()}" }}')
+    current_app.logger.info(
+        f'New readinglist item: {{ "URLString ": "{url}", "DateAdded": "{date_added.isoformat()}" }}')
 
     if get_debug_flag():
         data: List[ReadinglistItem] = cache.get('DEBUGDATA') or []
@@ -127,7 +127,7 @@ def add_readinglist_item(url: str):
 
 
 def delete_readinglist_item(index: int):
-    current_app.logger.debug(f'Attempting to delete item at index {index}')
+    current_app.logger.info(f'Attempting to delete item at index {index}')
     if get_debug_flag():
         data: List[ReadinglistItem] = cache.get('DEBUGDATA') or []
         data.pop(index)
@@ -135,7 +135,8 @@ def delete_readinglist_item(index: int):
         return
 
     item: ReadinglistItem = get_readinglist()[index]
-    osascript_call = ['osascript', '-l', 'JavaScript', current_app.root_path + '/static/remove_readinglist.js', str(index)]
+    js_src_path = current_app.root_path + '/static/remove_readinglist.js'
+    osascript_call = ['osascript', '-l', 'JavaScript', js_src_path, str(index)]
     thread = threading.Thread(target=subprocess.check_call, args=(osascript_call,))
     thread.start()
     deleted: List[ReadinglistItem] = cache.get(key=UNSAVED_KEY) or []

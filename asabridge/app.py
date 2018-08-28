@@ -20,7 +20,7 @@ def create_app() -> Flask:
         app.secret_key = b'Z\xb2\xb7S\xd9D\xe7\x05\xc7\r\xf2dR\xd9\xe9n'
         register_extensions(app)
         register_blueprints(app)
-        app.logger.debug('Finished app initialization.')
+        app.logger.info('Finished app initialization.')
     return app
 
 

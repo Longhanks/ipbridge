@@ -14,8 +14,8 @@ blueprint = Blueprint('logs', __name__, static_folder='../static')
 @login_required
 def stream():
     def event_stream():
-        current_app.logger.info('Launching tail.')
-        popen = subprocess.Popen(['/usr/bin/tail', '-n', '20', '-F', LOG_FILE_PATH],
+        current_app.logger.info('Log live stream started.')
+        popen = subprocess.Popen(['/usr/bin/tail', '-n', '200', '-F', LOG_FILE_PATH],
                                  stdout=subprocess.PIPE,
                                  universal_newlines=True)
         while True:
@@ -23,7 +23,7 @@ def stream():
                 stdout_line = popen.stdout.readline()
                 yield f'data: {stdout_line}\n'
             except GeneratorExit as generator_exit:
-                current_app.logger.info('Stopping tail.')
+                current_app.logger.info('Log live stream exited.')
                 popen.stdout.close()
                 popen.kill()
                 raise generator_exit

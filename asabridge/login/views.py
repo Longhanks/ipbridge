@@ -37,12 +37,12 @@ def login():
         password = request.form['password']
         remember_me = request.form.get('remember_me') == 'on' or False
         next_link = request.args.get('next')
-        current_app.logger.debug(f'Login attempt, username={username}, remember={remember_me}, next={next_link}')
+        current_app.logger.info(f'Login attempt, username={username}, remember={remember_me}, next={next_link}')
         if not simplepam.authenticate(username, password):
-            current_app.logger.debug(f'Login attempt for {username} failed.')
+            current_app.logger.info(f'Login attempt for {username} failed.')
             session['failed_login_attempt'] = True
             return redirect(url_for('login.login', next=next_link))
-        current_app.logger.debug(f'Login for {username} succeeded.')
+        current_app.logger.info(f'Login for {username} succeeded.')
         login_user(User(username), remember=remember_me)
         if not is_safe_url(next_link):
             return url_for('index.index')
