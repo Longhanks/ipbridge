@@ -68,19 +68,5 @@
             {% endfor %}
         </div>
     </div>
-    <script>
-        'use strict';
-        let urlInput = document.getElementById('urlInput');
-        urlInput.addEventListener('input', function() {
-            urlInput.classList.remove('is-invalid');
-        }, false);
-        let form = document.getElementById('addReadinglistItemForm');
-        form.addEventListener('submit', function (event) {
-            if (!urlInput.checkValidity()) {
-                urlInput.classList.add("is-invalid");
-                event.preventDefault();
-                event.stopPropagation();
-            }
-        }, false);
-    </script>
+    <script src="{{ url_for('static', filename='readinglist/readinglist.js') }}"></script>
 {% endblock %}

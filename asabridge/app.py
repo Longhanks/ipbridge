@@ -4,8 +4,11 @@ import os
 from flask import Flask
 from flask.helpers import get_debug_flag
 
+import eventlet
+eventlet.monkey_patch()
+
 from asabridge import debug, index, login, logs, readinglist
-from asabridge.extensions import cache, cache_config, login_manager
+from asabridge.extensions import cache, cache_config, login_manager, socketio
 from asabridge.user import User
 
 
@@ -34,6 +37,7 @@ def register_extensions(app):
     login_manager.login_view = 'login.login'
     login_manager.login_message = None
     login_manager.user_loader(lambda _id: User(_id))
+    socketio.init_app(app, message_queue='redis://')
 
 
 def register_blueprints(app):

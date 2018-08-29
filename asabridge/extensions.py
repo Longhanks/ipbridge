@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from flask_caching import Cache
 from flask_login import LoginManager
+from flask_socketio import SocketIO
 
 from typing import Dict
 
@@ -14,3 +15,4 @@ cache_config: Dict[str, str] = {
 
 cache = Cache()
 login_manager = LoginManager()
+socketio = SocketIO()

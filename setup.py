@@ -8,6 +8,7 @@ setup(
         'flask',
         'flask-login',
         'flask-caching',
+        'flask-socketio',
         'simplepam',
         'humanize',
         'python-dateutil',

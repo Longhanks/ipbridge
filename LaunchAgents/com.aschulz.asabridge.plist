@@ -11,13 +11,13 @@
         <array>
             <string>/usr/local/bin/gunicorn</string>
             <string>-w</string>
-            <string>5</string>
+            <string>1</string>
             <string>--bind</string>
             <string>127.0.0.1:12136</string>
             <string>--log-level</string>
             <string>debug</string>
             <string>--worker-class</string>
-            <string>gevent</string>
+            <string>eventlet</string>
             <string>autoapp</string>
         </array>        
         <key>StandardOutPath</key>

@@ -13,7 +13,7 @@ Web access to local macOS services. Current features:
   - Instant response using [redis](https://redis.io "redis") cache
 - Access to the application's log file
   - Previously logged lines
-  - Live stream of new log lines via [SSE](https://en.wikipedia.org/wiki/Server-sent_events "Server-sent events")
+  - Live stream of new log lines via [socket.io](https://socket.io "socket.io")
 
 ## Requirements
 
@@ -41,16 +41,22 @@ FLASK_APP=autoapp.py FLASK_ENV=development python3 -m flask run
 
 ### Production
 
-- LaunchAgent: Change working directory from `/Users/aschulz/Projects/asabridge` to the deployment directory.
-- Change the `LOG_FILE_PATH` in `asabridge/logs/views.py` to fit what's in the LaunchAgent as stdout file path.
+- LaunchAgents:
+  - asabridge:
+    - Change working directory from `/Users/aschulz/Projects/asabridge` to the deployment directory.
+    - Change the stdout and stderr paths to the desired log file path.
+  - logstream:
+    - Change `LOG_FILE_PATH` as above.
+- Change the `LOG_FILE_PATH` in `asabridge/logs/views.py` as above.
 - Change the `IMAGE_CACHE_PATH` in `asabridge/readinglist/readinglist.py` to an other temporary directory if `/tmp` is unsuitable or not writable.
   - This must be changed in the nginx config, too, to enable serving the cached reading list preview images.
-- Use the LaunchAgent to start asabridge at port 12136.
+- Use the LaunchAgents to start asabridge and the logstream.
 - nginx config:
   - Change the domain name and the path to the SSL certificate + key.
   - If `IMAGE_CACHE_PATH` was changed as mentioned above, change it here, too.
   - Change the path to the static files to the deployment directory.
-- Take a look at the LaunchAgent plist to see the gunicorn flags.
+- Take a look at the asabridge LaunchAgent plist to see the gunicorn flags.
+  -  Do not increase the number of workers, as it breaks flask-socketio ([see also](https://flask-socketio.readthedocs.io/en/latest/#gunicorn-web-server)).
 
 ## Ideas/ToDo
 

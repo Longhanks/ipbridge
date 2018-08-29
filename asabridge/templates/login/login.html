@@ -27,33 +27,5 @@
             <p class="copyright-text text-muted">© Andreas Schulz</p>
         </div>
     </div>
-    <script>
-        'use strict';
-        let usernameInput = document.getElementById('usernameInput');
-        let passwordInput = document.getElementById('passwordInput');
-        usernameInput.addEventListener('input', function() {
-            usernameInput.classList.remove('is-invalid');
-            passwordInput.classList.remove('is-invalid');
-        }, false);
-        passwordInput.addEventListener('input', function() {
-            usernameInput.classList.remove('is-invalid');
-            passwordInput.classList.remove('is-invalid');
-        }, false);
-        let form = document.getElementById('loginForm');
-        form.addEventListener('submit', function (event) {
-            let valid = true;
-            if (!usernameInput.checkValidity()) {
-                usernameInput.classList.add("is-invalid");
-                valid = false;
-            }
-            if (!passwordInput.checkValidity()) {
-                passwordInput.classList.add("is-invalid");
-                valid = false;
-            }
-            if (!valid) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-        }, false);
-    </script>
+    <script src="{{ url_for('static', filename='login/login.js') }}"></script>
 {% endblock %}
