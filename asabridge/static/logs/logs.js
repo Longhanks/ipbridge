@@ -79,7 +79,7 @@ $(document).ready(function() {
     var received_before_initial = []
 
     socket.on('initial-data', (data) => {
-        var has_initial = true;
+        has_initial = true;
         let lines = data.data.split('\n');
         for (var i = 0; i < lines.length; i++) {
             append_line(lines[i]);
