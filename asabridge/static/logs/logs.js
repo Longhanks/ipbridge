@@ -75,16 +75,26 @@ function append_line(line) {
 
 $(document).ready(function() {
     let socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + "/logstream");
+    var has_initial = false;
+    var received_before_initial = []
 
     socket.on('initial-data', (data) => {
+        var has_initial = true;
         let lines = data.data.split('\n');
         for (var i = 0; i < lines.length; i++) {
             append_line(lines[i]);
         }
+        for (var i = 0; i < received_before_initial.length; i++) {
+            append_line(received_before_initial[i]);
+        }
     });
 
     socket.on('new-log-line', (data) => {
-        append_line(data.data);
+        if (!has_initial) {
+            received_before_initial.push(data.data);
+        } else {
+            append_line(data.data);
+        }
     });
 
     socket.emit('request-initial-data');
