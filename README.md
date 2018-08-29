@@ -46,7 +46,10 @@ FLASK_APP=autoapp.py FLASK_ENV=development python3 -m flask run
 - Change the `IMAGE_CACHE_PATH` in `asabridge/readinglist/readinglist.py` to an other temporary directory if `/tmp` is unsuitable or not writable.
   - This must be changed in the nginx config, too, to enable serving the cached reading list preview images.
 - Use the LaunchAgent to start asabridge at port 12136.
-- nginx config: Add the domain name, the SSL certificate and key. This configuration provides a reverse proxy from 12137 to asabridge.
+- nginx config:
+  - Change the domain name and the path to the SSL certificate + key.
+  - If `IMAGE_CACHE_PATH` was changed as mentioned above, change it here, too.
+  - Change the path to the static files to the deployment directory.
 - Take a look at the LaunchAgent plist to see the gunicorn flags.
 
 ## Ideas/ToDo
