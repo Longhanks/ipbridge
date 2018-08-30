@@ -55,7 +55,7 @@ FLASK_APP=autoapp.py FLASK_ENV=development python3 -m flask run
   - Change the domain name and the path to the SSL certificate + key.
   - If `IMAGE_CACHE_PATH` was changed as mentioned above, change it here, too.
   - Change the path to the static files to the deployment directory.
-- Take a look at the asabridge LaunchAgent plist to see the gunicorn flags.
+- Adapt as desired the `gunicorn_config.py`.
   -  Do not increase the number of workers, as it breaks flask-socketio ([see also](https://flask-socketio.readthedocs.io/en/latest/#gunicorn-web-server)).
 
 ## Ideas/ToDo

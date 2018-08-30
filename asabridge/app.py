@@ -4,26 +4,32 @@ import os
 from flask import Flask
 from flask.helpers import get_debug_flag
 
-import eventlet
-eventlet.monkey_patch()
-
 from asabridge import debug, index, login, logs, readinglist
 from asabridge.extensions import cache, cache_config, login_manager, socketio
+from asabridge.isoformatter import IsoFormatter
 from asabridge.user import User
+
+ERROR_FMT = r'%(asctime)s [%(process)d] [%(levelname)s] %(message)s)'
 
 
 def create_app() -> Flask:
     app = Flask(__name__.split('.')[0])
-    if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-        if __name__ != '__main__' and not get_debug_flag():
-            gunicorn_logger = logging.getLogger('gunicorn.error')
-            app.logger.handlers = gunicorn_logger.handlers
-            app.logger.setLevel(gunicorn_logger.level)
-        # Change me!
-        app.secret_key = b'Z\xb2\xb7S\xd9D\xe7\x05\xc7\r\xf2dR\xd9\xe9n'
-        register_extensions(app)
-        register_blueprints(app)
-        app.logger.info('Finished app initialization.')
+    is_werkzeug = os.environ.get("WERKZEUG_RUN_MAIN") == "true"
+
+    if is_werkzeug:
+        for handler in app.logger.handlers:
+            handler.setFormatter(IsoFormatter(ERROR_FMT))
+
+    if __name__ != '__main__' and not get_debug_flag() and not is_werkzeug:
+        gunicorn_logger = logging.getLogger('gunicorn.error')
+        app.logger.handlers = gunicorn_logger.handlers
+        app.logger.setLevel(gunicorn_logger.level)
+
+    # Change me!
+    app.secret_key = b'Z\xb2\xb7S\xd9D\xe7\x05\xc7\r\xf2dR\xd9\xe9n'
+    register_extensions(app)
+    register_blueprints(app)
+    app.logger.info('Finished app initialization.')
     return app
 
 

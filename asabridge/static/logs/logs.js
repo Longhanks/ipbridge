@@ -16,12 +16,9 @@ function append_line(line) {
         if (split.length >= 4) {
             // might be gunicorn logger message.
 
-            // Sample date: [2018-08-28 04:29:10 +0200]
-            if (split[0].length == 27) {
-                var isodate = split[0].substring(1, 11) + 'T';
-                isodate += split[0].substring(12, 20);
-                isodate += split[0].substring(21, 24);
-                isodate += ':' + split[0].substring(24, 26);
+            // Sample date: [2018-08-30T03:14:42.395+02:00]
+            if (split[0].length == 31) {
+                var isodate = split[0].substring(1, 30);
                 var timestamp = Date.parse(isodate);
                 if (isNaN(timestamp) === false) {
                     var timestamp_span = document.createElement('span');
@@ -76,6 +73,7 @@ function append_line(line) {
 $(document).ready(function() {
     let socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + "/logstream");
     var has_initial = false;
+    var lines_cache_parsed = false;
     var received_before_initial = []
 
     socket.on('initial-data', (data) => {
@@ -90,10 +88,23 @@ $(document).ready(function() {
     });
 
     socket.on('new-log-line', (data) => {
-        if (!has_initial) {
-            received_before_initial.push(data.data);
+        if (!lines_cache_parsed) {
+            if (!has_initial) {
+                for (var i = 0; i < data.data.length; i++) {
+                    received_before_initial.push(data.data[i]);
+                }
+            } else {
+                for (var i = 0; i < data.data.length; i++) {
+                    append_line(data.data[i]);
+                }
+            }
+            lines_cache_parsed = true;
         } else {
-            append_line(data.data);
+            if (!has_initial) {
+                received_before_initial.push(data.data[data.data.length - 1]);
+            } else {
+                append_line(data.data[data.data.length - 1]);
+            }
         }
     });
 
