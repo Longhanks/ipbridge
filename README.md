@@ -61,3 +61,8 @@ FLASK_APP=autoapp.py FLASK_ENV=development python3 -m flask run
 ## Ideas/ToDo
 
 - Tests.
+
+## Acknowledgements
+
+- favicon:
+  - [Feather](https://feathericons.com "feathericons.com") ([MIT License](https://github.com/feathericons/feather/blob/master/LICENSE "MIT License"))
