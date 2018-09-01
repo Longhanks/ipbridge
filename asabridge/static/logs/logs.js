@@ -76,7 +76,7 @@ $(document).ready(function() {
     var lines_cache_parsed = false;
     var received_before_initial = []
 
-    socket.on('initial-data', (data) => {
+    socket.on('initial-data', function(data) {
         has_initial = true;
         let lines = data.data.split('\n');
         for (var i = 0; i < lines.length; i++) {
@@ -87,7 +87,7 @@ $(document).ready(function() {
         }
     });
 
-    socket.on('new-log-line', (data) => {
+    socket.on('new-log-line', function(data) {
         if (!lines_cache_parsed) {
             if (!has_initial) {
                 for (var i = 0; i < data.data.length; i++) {
