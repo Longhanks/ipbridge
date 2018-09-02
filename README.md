@@ -53,7 +53,7 @@ FLASK_APP=asabridge_app.py FLASK_ENV=development python3 -m flask run
   - Change the domain name and the path to the SSL certificate + key.
   - If `IMAGE_CACHE_PATH` was changed as mentioned above, change it here, too.
   - Change the path to the static files and the favicons to the deployment directory.
-- Adapt as desired the `gunicorn_config.py`.
+- Adapt as desired the `asabridge_config.py`.
   -  Do not increase the number of workers, as it breaks flask-socketio ([see also](https://flask-socketio.readthedocs.io/en/latest/#gunicorn-web-server)).
 
 ## Ideas/ToDo

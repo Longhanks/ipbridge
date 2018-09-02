@@ -11,7 +11,7 @@
         <array>
             <string>/usr/local/bin/gunicorn</string>
             <string>--config</string>
-            <string>asabridge_config.py</string>
+            <string>asabridge/config.py</string>
             <string>asabridge_app</string>
         </array>        
         <key>StandardOutPath</key>

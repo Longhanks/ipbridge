@@ -9,24 +9,26 @@ from asabridge.extensions import cache, cache_config, login_manager, socketio
 from asabridge.isoformatter import IsoFormatter
 from asabridge.user import User
 
-ERROR_FMT = r'[%(asctime)s] [%(process)d] [%(levelname)s] %(message)s'
-
 
 def create_app() -> Flask:
     app = Flask(__name__.split('.')[0])
+
+    if get_debug_flag():
+        app.config.from_object('asabridge.config.DevelopmentConfig')
+    else:
+        app.config.from_object('asabridge.config.ProductionConfig')
+
     is_werkzeug = os.environ.get("WERKZEUG_RUN_MAIN") == "true"
 
     if is_werkzeug:
         for handler in app.logger.handlers:
-            handler.setFormatter(IsoFormatter(ERROR_FMT))
+            handler.setFormatter(IsoFormatter(app.config['ERROR_FMT']))
 
     if __name__ != '__main__' and not get_debug_flag() and not is_werkzeug:
         gunicorn_logger = logging.getLogger('gunicorn.error')
         app.logger.handlers = gunicorn_logger.handlers
         app.logger.setLevel(gunicorn_logger.level)
 
-    # Change me!
-    app.secret_key = b'Z\xb2\xb7S\xd9D\xe7\x05\xc7\r\xf2dR\xd9\xe9n'
     register_extensions(app)
     register_blueprints(app)
     app.logger.info('Finished app initialization.')
