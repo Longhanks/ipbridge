@@ -34,7 +34,7 @@ For example, use [tccutil](https://github.com/jacobsalmela/tccutil "tccutil").
 ### Development
 
 ```bash
-FLASK_APP=autoapp.py FLASK_ENV=development python3 -m flask run
+FLASK_APP=asabridge_app.py FLASK_ENV=development python3 -m flask run
 ```
 
 ### Production

@@ -12,7 +12,7 @@
             <string>/usr/local/bin/gunicorn</string>
             <string>--config</string>
             <string>gunicorn_config.py</string>
-            <string>autoapp</string>
+            <string>asabridge_app</string>
         </array>        
         <key>StandardOutPath</key>
         <string>/Users/aschulz/Projects/asabridge/log/asabridge.log</string>
