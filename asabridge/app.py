@@ -9,7 +9,7 @@ from asabridge.extensions import cache, cache_config, login_manager, socketio
 from asabridge.isoformatter import IsoFormatter
 from asabridge.user import User
 
-ERROR_FMT = r'%(asctime)s [%(process)d] [%(levelname)s] %(message)s)'
+ERROR_FMT = r'[%(asctime)s] [%(process)d] [%(levelname)s] %(message)s'
 
 
 def create_app() -> Flask:

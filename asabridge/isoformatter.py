@@ -9,4 +9,4 @@ class IsoFormatter(Formatter):
         msec_s = '%03d' % record.msecs
         raw_timezone_s = time.strftime('%z', timestamp)
         timezone_s = raw_timezone_s[:3] + ':' + raw_timezone_s[3:]
-        return time.strftime(f'[%Y-%m-%dT%H:%M:%S.{msec_s}{timezone_s}]', timestamp)
+        return time.strftime(f'%Y-%m-%dT%H:%M:%S.{msec_s}{timezone_s}', timestamp)
