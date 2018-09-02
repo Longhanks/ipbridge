@@ -60,6 +60,9 @@ FLASK_APP=autoapp.py FLASK_ENV=development python3 -m flask run
 
 ## Ideas/ToDo
 
+- Single point of configuration.
+- JWT-based authentication.
+- Proper front end framework.
 - Tests.
 
 ## Acknowledgements
