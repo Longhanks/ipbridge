@@ -23,9 +23,7 @@ Web access to local macOS services. Current features:
 ## Installation
 
 ```bash
-virtualenv venv
-. venv/bin/activate
-pip install -e .
+pipenv install
 ```
 
 You must find a way to allow the processes nginx, gunicorn and python3 to control your computer (macOS Security settings).
