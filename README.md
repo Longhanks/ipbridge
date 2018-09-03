@@ -56,9 +56,7 @@ FLASK_APP=asabridge_app.py FLASK_ENV=development python3 -m flask run
 
 ## Ideas/ToDo
 
-- Single point of configuration.
-- JWT-based authentication.
-- Proper front end framework.
+- Use [Vue.js](https://vuejs.org/).
 - Tests.
 
 ## Acknowledgements
