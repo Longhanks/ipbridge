@@ -14,18 +14,15 @@ from flask.helpers import get_debug_flag
 from asabridge.extensions import cache
 from .readinglist_item import ReadinglistItem
 
-UNSAVED_KEY = 'readinglist:unsaved'
-DELETED_KEY = 'readinglist:deleted'
-IMAGE_CACHE_PATH = Path('/tmp/asabridge/imagecache')
-
 
 def get_cached_image(image_url: Optional[str]) -> Optional[str]:
     if image_url is None:
         return None
     file_name = hashlib.sha512(image_url.encode()).hexdigest()
-    if not IMAGE_CACHE_PATH.exists():
-        IMAGE_CACHE_PATH.mkdir(parents=True)
-    abs_path = IMAGE_CACHE_PATH / file_name
+    image_cache_path = Path(current_app.config['IMAGE_CACHE_PATH'])
+    if not image_cache_path.exists():
+        image_cache_path.mkdir(parents=True)
+    abs_path = image_cache_path / file_name
     if not abs_path.exists():
         current_app.logger.info(f'No cached image found for {image_url}.')
         current_app.logger.info(f'Downloading {image_url} to serve it cached.')
@@ -60,7 +57,7 @@ def get_readinglist() -> List[ReadinglistItem]:
         pythonic_readinglist.append(rl_item)
 
     # The cache of unsaved readinglist items.
-    unsaved: List[ReadinglistItem] = cache.get(UNSAVED_KEY) or []
+    unsaved: List[ReadinglistItem] = cache.get(current_app.config['READING_LIST_UNSAVED_KEY']) or []
 
     # First, check if unsaved items are now part of the readinglist and remove them from the unsaved list, if so.
     for rl_item in pythonic_readinglist:
@@ -74,14 +71,14 @@ def get_readinglist() -> List[ReadinglistItem]:
             unsaved.pop(unsaved_index)
 
     # Save cache updates.
-    cache.set(key=UNSAVED_KEY, value=unsaved, timeout=120)
+    cache.set(key=current_app.config['READING_LIST_UNSAVED_KEY'], value=unsaved, timeout=120)
 
     # Now add the remaining items from the unsaved list to the readinglist.
     pythonic_readinglist += unsaved
     pythonic_readinglist.sort(key=lambda rl_item: rl_item.date, reverse=True)
 
     # Now remove the items that are marked as deleted.
-    deleted: List[ReadinglistItem] = cache.get(DELETED_KEY) or []
+    deleted: List[ReadinglistItem] = cache.get(current_app.config['READING_LIST_DELETED_KEY']) or []
     deletion_finished_indices = []
     for deleted_item_index, deleted_item in enumerate(deleted):
         rl_index = None
@@ -100,7 +97,7 @@ def get_readinglist() -> List[ReadinglistItem]:
         deleted.pop(index)
 
     # Save cache updates.
-    cache.set(key=DELETED_KEY, value=deleted, timeout=120)
+    cache.set(key=current_app.config['READING_LIST_DELETED_KEY'], value=deleted, timeout=120)
 
     return pythonic_readinglist
 
@@ -121,9 +118,9 @@ def add_readinglist_item(url: str):
     js_call = 'Application("Safari").addReadingListItem("' + url + '")'
     osascript_call = ['osascript', '-l', 'JavaScript', '-e', js_call]
     subprocess.check_call(osascript_call)
-    unsaved: List[ReadinglistItem] = cache.get(key=UNSAVED_KEY) or []
+    unsaved: List[ReadinglistItem] = cache.get(key=current_app.config['READING_LIST_UNSAVED_KEY']) or []
     unsaved.append(rl_item)
-    cache.set(key=UNSAVED_KEY, value=unsaved, timeout=120)
+    cache.set(key=current_app.config['READING_LIST_UNSAVED_KEY'], value=unsaved, timeout=120)
 
 
 def delete_readinglist_item(index: int):
@@ -139,6 +136,6 @@ def delete_readinglist_item(index: int):
     osascript_call = ['osascript', '-l', 'JavaScript', js_src_path, str(index)]
     thread = threading.Thread(target=subprocess.check_call, args=(osascript_call,))
     thread.start()
-    deleted: List[ReadinglistItem] = cache.get(key=UNSAVED_KEY) or []
+    deleted: List[ReadinglistItem] = cache.get(key=current_app.config['READING_LIST_UNSAVED_KEY']) or []
     deleted.append(item)
-    cache.set(key=DELETED_KEY, value=deleted, timeout=120)
+    cache.set(key=current_app.config['READING_LIST_DELETED_KEY'], value=deleted, timeout=120)

@@ -39,23 +39,19 @@ FLASK_APP=asabridge_app.py FLASK_ENV=development python3 -m flask run
 
 ### Production
 
-- LaunchAgents:
-  - asabridge:
-    - Change working directory from `/Users/aschulz/Projects/asabridge` to the deployment directory.
-    - Change the stdout and stderr paths to the desired log file path.
-  - logstream:
-    - Change `LOG_FILE_PATH` as above.
-- Change the `LOG_FILE_PATH` in `asabridge/logs/views.py` as above.
-- Change the `IMAGE_CACHE_PATH` in `asabridge/readinglist/readinglist.py` to an other temporary directory if `/tmp` is unsuitable or not writable.
-  - This must be changed in the nginx config, too, to enable serving the cached reading list preview images.
-- Use the LaunchAgents to start asabridge and the logstream.
+- LaunchAgent:
+  - Change working directory from `/Users/aschulz/Projects/asabridge` to the deployment directory.
+  - Change the stdout and stderr paths to the desired log file path.
+- Use the LaunchAgent to start asabridge.
 - nginx config:
   - Change the domain name and the path to the SSL certificate + key.
-  - If `IMAGE_CACHE_PATH` was changed as mentioned above, change it here, too.
+  - `IMAGE_CACHE_PATH` must be a directory where asabridge can cache temporary images.
   - Change the path to the static files and the favicons to the deployment directory.
-- `asabridge/config.py`:
-  - Change `SERVER_NAME` to the same as in the nginx config.
+- `asabridge/config.py` (`ProductionConfig`):
+  - Change the `IMAGE_CACHE_PATH` if it was changed in the nginx configration.
+  - Change `SERVER_NAME` to your the same as in the nginx configuration.
   - Generate a new `SECRET_KEY` via `python -c 'import os; print(os.urandom(16))'`.
+  - Change `LOG_FILE_PATH` to the stdout path of the LaunchAgent.
   - Do not increase the number of workers, as it breaks flask-socketio ([see also](https://flask-socketio.readthedocs.io/en/latest/#gunicorn-web-server)).
 
 ## Ideas/ToDo

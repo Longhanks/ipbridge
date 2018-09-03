@@ -4,12 +4,9 @@ from flask_login import login_required, current_user
 from flask_socketio import disconnect, emit
 
 import functools
-from pathlib import Path
 import subprocess
 
 from asabridge.extensions import socketio
-
-LOG_FILE_PATH = Path('/Users/aschulz/Projects/asabridge/log/asabridge.log')
 
 blueprint = Blueprint('logs', __name__, static_folder='../static')
 
@@ -30,7 +27,7 @@ def ws_login_required(f):
 def on_request_initial():
     current_app.logger.info('Log stream client wants initial data.')
     try:
-        out = subprocess.check_output(['/usr/bin/tail', '-n', '200', LOG_FILE_PATH],
+        out = subprocess.check_output(['/usr/bin/tail', '-n', '200', current_app.config['LOG_FILE_PATH']],
                                       stderr=subprocess.DEVNULL,
                                       universal_newlines=True)
         out = out[:len(out) - 1]
