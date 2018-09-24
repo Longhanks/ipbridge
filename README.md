@@ -17,7 +17,7 @@ Web access to local macOS services. Current features:
 
 ## Requirements
 
-- Python 3.6 or newer
+- [pipenv](https://pipenv.readthedocs.io/en/latest/ "pipenv")
 - [redis](https://redis.io "redis")
 
 ## Installation
@@ -26,8 +26,9 @@ Web access to local macOS services. Current features:
 pipenv install
 ```
 
-You must find a way to allow the processes nginx, gunicorn and python3 to control your computer (macOS Security settings).
-For example, use [tccutil](https://github.com/jacobsalmela/tccutil "tccutil").
+Granting assistive access via System Preferences is required for these processes:
+- ```/usr/local/Cellar/python/3.7.0/Frameworks/Python.framework/Versions/3.7/Resources/Python.app/Contents/MacOS/Python```
+- ```/usr/local/bin/gunicorn```
 
 ## Running
 
@@ -56,8 +57,9 @@ FLASK_APP=asabridge_app.py FLASK_ENV=development python3 -m flask run
 
 ## Ideas/ToDo
 
-- Use [Vue.js](https://vuejs.org/).
-- Tests.
+- REST API
+- SPA front end building upon REST API
+- Tests
 
 ## Acknowledgements
 
