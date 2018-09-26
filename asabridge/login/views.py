@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, render_template, current_app, request, abort, url_for, redirect, session
+from flask import Blueprint, render_template, current_app, request, abort, url_for, redirect, session, after_this_request
 from flask_login import login_user, current_user, logout_user
 from urllib.parse import urlparse, urljoin
 import simplepam
@@ -55,3 +55,18 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('login.login'))
+
+@blueprint.route('/api/authenticated', methods=['GET', 'OPTIONS'])
+def api_authenticated():
+    @after_this_request
+    def add_cors(response):
+        response.headers['Access-Control-Allow-Origin'] = 'https://www.as-schulz.de:12138'
+        return response
+
+    if request.method == 'OPTIONS':
+        return '', 204
+
+    if current_user.is_authenticated:
+        return '', 204
+    else:
+        abort(401)
