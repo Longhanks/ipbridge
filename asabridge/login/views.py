@@ -44,14 +44,20 @@ def login():
 
 
 @blueprint.route('/old/logout', methods=['GET'])
-def logout():
+def old_logout():
     logout_user()
     return redirect(url_for('login.login'))
 
 
 @blueprint.route('/api/authenticated', methods=['GET'])
-def api_authenticated():
+def authenticated():
     if current_user.is_authenticated:
         return '', 204
     else:
         abort(401)
+
+
+@blueprint.route('/api/logout', methods=['POST'])
+def logout():
+    logout_user()
+    return redirect('/login', code=303)
