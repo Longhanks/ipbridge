@@ -60,4 +60,4 @@ def authenticated():
 @blueprint.route('/api/logout', methods=['POST'])
 def logout():
     logout_user()
-    return redirect('/login', code=303)
+    return '', 204
