@@ -44,7 +44,7 @@ def on_connect():
 
 @socketio.on('disconnect', namespace='/logstream')
 @ws_login_required
-def on_connect():
+def on_disconnect():
     current_app.logger.info('Log stream client disconnected.')
 
 
@@ -53,7 +53,7 @@ def on_error(e):
     current_app.logger.error('Error during log stream session: ' + str(e))
 
 
-@blueprint.route('/logs', methods=['GET'])
+@blueprint.route('/old-logs', methods=['GET'])
 @login_required
 def logs():
     return render_template('logs/logs.html')

@@ -6,7 +6,7 @@ from flask_login import login_required
 blueprint = Blueprint('index', __name__, static_folder='../static')
 
 
-@blueprint.route('/', methods=['GET'])
+@blueprint.route('/old-index', methods=['GET'])
 @login_required
 def index():
     return render_template('index/index.html')

@@ -13,7 +13,7 @@ from . import readinglist
 blueprint = Blueprint('readinglist', __name__, static_folder='../static')
 
 
-@blueprint.route('/readinglist/add', methods=['POST'])
+@blueprint.route('/old-readinglist/add', methods=['POST'])
 @login_required
 def add_readinglist_item():
     url = request.form['url'] or ''
@@ -26,7 +26,7 @@ def add_readinglist_item():
     return redirect(url_for('readinglist.get_readinglist_items'))
 
 
-@blueprint.route('/readinglist/delete', methods=['POST'])
+@blueprint.route('/old-readinglist/delete', methods=['POST'])
 @login_required
 def delete_readinglist_item():
     index = request.form['index']
@@ -40,7 +40,7 @@ def delete_readinglist_item():
     return redirect(url_for('readinglist.get_readinglist_items'))
 
 
-@blueprint.route('/readinglist', methods=['GET'])
+@blueprint.route('/old-readinglist', methods=['GET'])
 @login_required
 def get_readinglist_items():
     entries = readinglist.get_readinglist()
