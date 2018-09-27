@@ -53,7 +53,7 @@ def on_error(e):
     current_app.logger.error('Error during log stream session: ' + str(e))
 
 
-@blueprint.route('/old-logs', methods=['GET'])
+@blueprint.route('/old/logs', methods=['GET'])
 @login_required
 def logs():
     return render_template('logs/logs.html')

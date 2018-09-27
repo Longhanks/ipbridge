@@ -16,7 +16,7 @@ def is_safe_url(target):
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
 
 
-@blueprint.route('/old-login', methods=['GET', 'POST'])
+@blueprint.route('/old/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index.index'))
@@ -43,7 +43,7 @@ def login():
         abort(400)
 
 
-@blueprint.route('/old-logout', methods=['GET'])
+@blueprint.route('/old/logout', methods=['GET'])
 def logout():
     logout_user()
     return redirect(url_for('login.login'))

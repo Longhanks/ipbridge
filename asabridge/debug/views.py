@@ -11,7 +11,7 @@ from asabridge.readinglist.readinglist_item import ReadinglistItem
 blueprint = Blueprint('debug', __name__, static_folder='../static')
 
 
-@blueprint.route('/resetDebugData', methods=['GET'])
+@blueprint.route('/old/resetDebugData', methods=['GET'])
 @login_required
 def index():
     sample_data: List[ReadinglistItem] = []
