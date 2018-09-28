@@ -8,7 +8,7 @@ import sys
 from flask import Flask
 from flask.helpers import get_debug_flag
 
-from asabridge import debug, index, login, logs, readinglist
+from asabridge import debug, login, logs, readinglist
 from asabridge.extensions import cache, login_manager, socketio
 from asabridge.isoformatter import IsoFormatter
 from asabridge.user import User
@@ -84,7 +84,6 @@ def register_extensions(app):
     """Register Flask extensions."""
     cache.init_app(app, config=app.config['CACHE_CONFIG'])
     login_manager.init_app(app)
-    login_manager.login_view = 'login.login'
     login_manager.login_message = None
     login_manager.user_loader(lambda _id: User(_id))
     socketio.init_app(app, message_queue=app.config['REDIS_URL'])
@@ -94,7 +93,6 @@ def register_blueprints(app):
     """Register Flask blueprints."""
     if app.debug:
         app.register_blueprint(debug.views.blueprint)
-    app.register_blueprint(index.views.blueprint)
     app.register_blueprint(login.views.blueprint)
     app.register_blueprint(logs.views.blueprint)
     app.register_blueprint(readinglist.views.blueprint)
