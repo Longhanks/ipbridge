@@ -46,9 +46,23 @@ def create_app() -> Flask:
     if get_debug_flag():
         @app.after_request
         def after_request(response):
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            response.headers['Access-Control-Allow-Methods'] = '*'
-            response.headers['Access-Control-Allow-Headers'] = '*'
+            response.headers['Access-Control-Allow-Origin'] = 'http://localhost:8080'
+            response.headers['Access-Control-Allow-Methods'] = ','.join(['DELETE',
+                                                                         'GET',
+                                                                         'OPTIONS',
+                                                                         'PATCH',
+                                                                         'POST',
+                                                                         'PUT'])
+            response.headers['Access-Control-Allow-Headers'] = ','.join(['accept',
+                                                                         'accept-encoding',
+                                                                         'authorization',
+                                                                         'content-type',
+                                                                         'dnt',
+                                                                         'origin',
+                                                                         'user-agent',
+                                                                         'x-csrftoken',
+                                                                         'x-requested-with'])
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
             return response
 
     register_extensions(app)
