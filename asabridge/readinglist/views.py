@@ -3,7 +3,7 @@ import humanize
 import datetime
 from dateutil import tz
 
-from flask import Blueprint, request, redirect, url_for, render_template, abort
+from flask import Blueprint, request, redirect, url_for, render_template, abort, jsonify
 from flask_login import login_required
 
 from asabridge import validators
@@ -48,3 +48,13 @@ def get_readinglist_items():
         delta_date = datetime.datetime.now(tz.tzlocal()) - entry.date
         entry.date = humanize.naturaltime(delta_date)
     return render_template('readinglist/readinglist.html', entries=entries)
+
+
+@blueprint.route('/api/readinglist', methods=['GET'])
+@login_required
+def get():
+    entries = readinglist.get_readinglist()
+    for entry in entries:
+        delta_date = datetime.datetime.now(tz.tzlocal()) - entry.date
+        entry.date = humanize.naturaltime(delta_date)
+    return jsonify([entry.serialize() for entry in entries])

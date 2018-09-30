@@ -16,3 +16,12 @@ class ReadinglistItem:
         self.image_url = image_url
         self.date = date
         self.preview = preview or self.title
+
+    def serialize(self):
+        return {
+            'title': self.title,
+            'url': self.url,
+            'image_url': self.image_url,
+            'date': self.date,
+            'preview': self.preview
+        }
