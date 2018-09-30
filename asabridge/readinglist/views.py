@@ -50,6 +50,23 @@ def get_readinglist_items():
     return render_template('readinglist/readinglist.html', entries=entries)
 
 
+@blueprint.route('/api/readinglist/delete', methods=['POST'])
+@login_required
+def delete():
+    payload = request.get_json()
+    if payload is None:
+        abort(400)
+    index = payload.get('index', '-1')
+    try:
+        index = int(index)
+        if not index >= 0:
+            raise ValueError('Index must be >= 0')
+    except (TypeError, ValueError):
+        abort(400, f'Invalid index: {index}')
+    readinglist.delete_readinglist_item(index)
+    return '', 204
+
+
 @blueprint.route('/api/readinglist', methods=['GET'])
 @login_required
 def get():
