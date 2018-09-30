@@ -132,7 +132,7 @@ def delete_readinglist_item(index: int):
         return
 
     item: ReadinglistItem = get_readinglist()[index]
-    js_src_path = current_app.root_path + '/static/readinglist/remove_item.js'
+    js_src_path = current_app.root_path + '/readinglist/remove_item.js'
     osascript_call = ['osascript', '-l', 'JavaScript', js_src_path, str(index)]
     thread = threading.Thread(target=subprocess.check_call, args=(osascript_call,))
     thread.start()
