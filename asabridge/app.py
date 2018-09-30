@@ -43,6 +43,14 @@ def create_app() -> Flask:
         app.logger.error(f'Configuration error: {config_error}')
         sys.exit(1)
 
+    if get_debug_flag():
+        @app.after_request
+        def after_request(response):
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            response.headers['Access-Control-Allow-Methods'] = '*'
+            response.headers['Access-Control-Allow-Headers'] = '*'
+            return response
+
     register_extensions(app)
     register_blueprints(app)
 
