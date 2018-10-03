@@ -1,11 +1,10 @@
 # asabridge
 
-Web access to local macOS services. Current features:
+REST access to local macOS services. Current features:
 
 - Authentication system via system credentials
   - Login/logout via PAM to securely authenticate access
-  - Save login via cookie
-  - Redirect to previously entered URL once authenticated
+  - Save login via session cookie
 - Access to the Safari Reading List
   - See saved links, preview images and date added
   - Remove elements
@@ -19,6 +18,7 @@ Web access to local macOS services. Current features:
 
 - [pipenv](https://pipenv.readthedocs.io/en/latest/ "pipenv")
 - [redis](https://redis.io "redis")
+- [asabridge-web](https://github.com/Longhanks/asabridge-web "asabridge-web") (Front End)
 
 ## Installation
 
@@ -27,8 +27,8 @@ pipenv install
 ```
 
 Granting assistive access via System Preferences is required for these processes:
-- ```/usr/local/Cellar/python/3.7.0/Frameworks/Python.framework/Versions/3.7/Resources/Python.app/Contents/MacOS/Python```
-- ```/usr/local/bin/gunicorn```
+- Development: ```/usr/local/Cellar/python/3.7.0/Frameworks/Python.framework/Versions/3.7/Resources/Python.app/Contents/MacOS/Python```
+- Production: ```/usr/local/bin/gunicorn```
 
 ## Running
 
@@ -44,10 +44,11 @@ FLASK_APP=asabridge_app.py FLASK_ENV=development python3 -m flask run
   - Change working directory from `/Users/aschulz/Projects/asabridge` to the deployment directory.
   - Change the stdout and stderr paths to the desired log file path.
 - Use the LaunchAgent to start asabridge.
+- Build [asabridge-web](https://github.com/Longhanks/asabridge-web "asabridge-web").
 - nginx config:
   - Change the domain name and the path to the SSL certificate + key.
   - `IMAGE_CACHE_PATH` must be a directory where asabridge can cache temporary images.
-  - Change the path to the static files and the favicons to the deployment directory.
+  - Change the directory of location `/` to where [asabridge-web](https://github.com/Longhanks/asabridge-web "asabridge-web") was built (`dist`).
 - `asabridge/config.py` (`ProductionConfig`):
   - Change the `IMAGE_CACHE_PATH` if it was changed in the nginx configration.
   - Change `SERVER_NAME` to your the same as in the nginx configuration.
@@ -57,11 +58,4 @@ FLASK_APP=asabridge_app.py FLASK_ENV=development python3 -m flask run
 
 ## Ideas/ToDo
 
-- REST API
-- SPA front end building upon REST API
-- Tests
-
-## Acknowledgements
-
-- favicon:
-  - [Feather](https://feathericons.com "feathericons.com") ([MIT License](https://github.com/feathericons/feather/blob/master/LICENSE "MIT License"))
+- Tests.
