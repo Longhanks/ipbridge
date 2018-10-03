@@ -10,7 +10,7 @@ from asabridge import validators
 
 from . import readinglist
 
-blueprint = Blueprint('readinglist', __name__, static_folder='../static')
+blueprint = Blueprint('readinglist', __name__)
 
 
 @blueprint.route('/api/readinglist/add', methods=['POST'])

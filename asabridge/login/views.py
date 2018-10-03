@@ -6,7 +6,7 @@ import simplepam
 from asabridge.user import User
 
 
-blueprint = Blueprint('login', __name__, static_folder='../static')
+blueprint = Blueprint('login', __name__)
 
 
 @blueprint.route('/api/authenticated', methods=['GET'])

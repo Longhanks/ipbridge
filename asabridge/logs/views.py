@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, render_template, current_app
-from flask_login import login_required, current_user
+from flask import Blueprint, current_app
+from flask_login import current_user
 from flask_socketio import disconnect, emit
 
 import functools
@@ -8,7 +8,7 @@ import subprocess
 
 from asabridge.extensions import socketio
 
-blueprint = Blueprint('logs', __name__, static_folder='../static')
+blueprint = Blueprint('logs', __name__)
 
 
 def ws_login_required(f):
@@ -51,9 +51,3 @@ def on_disconnect():
 @socketio.on_error_default
 def on_error(e):
     current_app.logger.error('Error during log stream session: ' + str(e))
-
-
-@blueprint.route('/old/logs', methods=['GET'])
-@login_required
-def logs():
-    return render_template('logs/logs.html')
