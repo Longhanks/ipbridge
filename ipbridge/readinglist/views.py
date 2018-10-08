@@ -6,7 +6,7 @@ from dateutil import tz
 from flask import Blueprint, request, abort, jsonify
 from flask_login import login_required
 
-from asabridge import validators
+from ipbridge import validators
 
 from . import readinglist
 

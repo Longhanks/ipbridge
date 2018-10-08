@@ -3,7 +3,7 @@ from flask import Blueprint, current_app, request, abort
 from flask_login import login_user, current_user, logout_user
 import simplepam
 
-from asabridge.user import User
+from ipbridge.user import User
 
 
 blueprint = Blueprint('login', __name__)

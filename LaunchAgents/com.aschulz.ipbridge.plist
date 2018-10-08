@@ -4,19 +4,19 @@
         <key>KeepAlive</key>
         <true/>
         <key>Label</key>
-        <string>com.aschulz.asabridge</string>
+        <string>com.aschulz.ipbridge</string>
         <key>WorkingDirectory</key>
-        <string>/Users/aschulz/Projects/asabridge</string>
+        <string>/Users/aschulz/Projects/ipbridge</string>
         <key>ProgramArguments</key>
         <array>
             <string>/usr/local/bin/gunicorn</string>
             <string>--config</string>
-            <string>asabridge/config.py</string>
-            <string>asabridge_app</string>
+            <string>ipbridge/config.py</string>
+            <string>ipbridge_app</string>
         </array>        
         <key>StandardOutPath</key>
-        <string>/Users/aschulz/Projects/asabridge/log/asabridge.log</string>
+        <string>/Users/aschulz/Projects/ipbridge/log/ipbridge.log</string>
         <key>StandardErrorPath</key>
-        <string>/Users/aschulz/Projects/asabridge/log/asabridge.log</string>
+        <string>/Users/aschulz/Projects/ipbridge/log/ipbridge.log</string>
     </dict>
 </plist>

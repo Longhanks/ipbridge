@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 bind = '127.0.0.1:12136'
-logger_class = 'asabridge.gunicorn_isolog.IsoLogger'
+logger_class = 'ipbridge.gunicorn_isolog.IsoLogger'
 loglevel = 'debug'
 workers = 1
 worker_class = 'eventlet'
@@ -13,14 +13,14 @@ class Config(object):
     REDIS_URL = 'redis://localhost:6379'
     CACHE_CONFIG = {
         'CACHE_TYPE': 'redis',
-        'CACHE_KEY_PREFIX': 'adabridge-cache:',
+        'CACHE_KEY_PREFIX': 'ipbridge-cache:',
         'CACHE_REDIS_HOST': 'localhost',
         'CACHE_REDIS_PORT': '6379',
         'CACHE_REDIS_URL': REDIS_URL
     }
     READING_LIST_UNSAVED_KEY = 'readinglist:unsaved'
     READING_LIST_DELETED_KEY = 'readinglist:deleted'
-    IMAGE_CACHE_PATH = '/tmp/asabridge/imagecache'
+    IMAGE_CACHE_PATH = '/tmp/ipbridge/imagecache'
 
 
 class ProductionConfig(Config):
@@ -32,4 +32,4 @@ class ProductionConfig(Config):
 class DevelopmentConfig(Config):
     CACHE_CONFIG = {**Config.CACHE_CONFIG, 'CACHE_KEY_PREFIX': 'debug:adabridge-cache:'}
     SERVER_NAME = None
-    LOG_FILE_PATH = '/tmp/asabridge/log/asabridge.log'
+    LOG_FILE_PATH = '/tmp/ipbridge/log/ipbridge.log'

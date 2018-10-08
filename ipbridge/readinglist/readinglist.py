@@ -11,7 +11,7 @@ from typing import Optional, List
 from flask import current_app
 from flask.helpers import get_debug_flag
 
-from asabridge.extensions import cache
+from ipbridge.extensions import cache
 from .readinglist_item import ReadinglistItem
 
 

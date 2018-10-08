@@ -8,10 +8,10 @@ import sys
 from flask import Flask
 from flask.helpers import get_debug_flag
 
-from asabridge import debug, login, logs, readinglist
-from asabridge.extensions import cache, login_manager, socketio
-from asabridge.isoformatter import IsoFormatter
-from asabridge.user import User
+from ipbridge import debug, login, logs, readinglist
+from ipbridge.extensions import cache, login_manager, socketio
+from ipbridge.isoformatter import IsoFormatter
+from ipbridge.user import User
 
 
 class ConfigurationError(RuntimeError):
@@ -22,9 +22,9 @@ def create_app() -> Flask:
     app = Flask(__name__.split('.')[0])
 
     if get_debug_flag():
-        app.config.from_object('asabridge.config.DevelopmentConfig')
+        app.config.from_object('ipbridge.config.DevelopmentConfig')
     else:
-        app.config.from_object('asabridge.config.ProductionConfig')
+        app.config.from_object('ipbridge.config.ProductionConfig')
 
     is_werkzeug = os.environ.get("WERKZEUG_RUN_MAIN") == "true"
 

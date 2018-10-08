@@ -3,7 +3,7 @@
 """
 
 logstream.py
-Streams the log file content via tail -F to asabridge.
+Streams the log file content via tail -F to ipbridge.
 
 argv:
 1: log file path

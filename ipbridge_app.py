@@ -3,7 +3,7 @@ import eventlet
 
 eventlet.monkey_patch()
 
-from asabridge.app import create_app
+from ipbridge.app import create_app
 
 application = create_app()
 

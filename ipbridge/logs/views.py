@@ -6,7 +6,7 @@ from flask_socketio import disconnect, emit
 import functools
 import subprocess
 
-from asabridge.extensions import socketio
+from ipbridge.extensions import socketio
 
 blueprint = Blueprint('logs', __name__)
 

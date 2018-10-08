@@ -5,8 +5,8 @@ from flask import Blueprint
 from flask_login import login_required
 from typing import List
 
-from asabridge.extensions import cache
-from asabridge.readinglist.readinglist_item import ReadinglistItem
+from ipbridge.extensions import cache
+from ipbridge.readinglist.readinglist_item import ReadinglistItem
 
 blueprint = Blueprint('debug', __name__)
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from gunicorn.glogging import Logger
-from asabridge.isoformatter import IsoFormatter
-from asabridge.config import ProductionConfig
+from ipbridge.isoformatter import IsoFormatter
+from ipbridge.config import ProductionConfig
 
 
 class IsoLogger(Logger):

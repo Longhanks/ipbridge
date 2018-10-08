@@ -1,4 +1,4 @@
-# asabridge
+# ipbridge
 
 REST access to local macOS services. Current features:
 
@@ -18,7 +18,7 @@ REST access to local macOS services. Current features:
 
 - [pipenv](https://pipenv.readthedocs.io/en/latest/ "pipenv")
 - [redis](https://redis.io "redis")
-- [asabridge-web](https://github.com/Longhanks/asabridge-web "asabridge-web") (Front End)
+- [ipbridge-web](https://github.com/Longhanks/ipbridge-web "ipbridge-web") (Front End)
 
 ## Installation
 
@@ -35,21 +35,21 @@ Granting assistive access via System Preferences is required for these processes
 ### Development
 
 ```bash
-FLASK_APP=asabridge_app.py FLASK_ENV=development python3 -m flask run
+FLASK_APP=ipbridge_app.py FLASK_ENV=development python3 -m flask run
 ```
 
 ### Production
 
 - LaunchAgent:
-  - Change working directory from `/Users/aschulz/Projects/asabridge` to the deployment directory.
+  - Change working directory from `/Users/aschulz/Projects/ipbridge` to the deployment directory.
   - Change the stdout and stderr paths to the desired log file path.
-- Use the LaunchAgent to start asabridge.
-- Build [asabridge-web](https://github.com/Longhanks/asabridge-web "asabridge-web").
+- Use the LaunchAgent to start ipbridge.
+- Build [ipbridge-web](https://github.com/Longhanks/ipbridge-web "ipbridge-web").
 - nginx config:
   - Change the domain name and the path to the SSL certificate + key.
-  - `IMAGE_CACHE_PATH` must be a directory where asabridge can cache temporary images.
-  - Change the directory of location `/` to where [asabridge-web](https://github.com/Longhanks/asabridge-web "asabridge-web") was built (`dist`).
-- `asabridge/config.py` (`ProductionConfig`):
+  - `IMAGE_CACHE_PATH` must be a directory where ipbridge can cache temporary images.
+  - Change the directory of location `/` to where [ipbridge-web](https://github.com/Longhanks/ipbridge-web "ipbridge-web") was built (`dist`).
+- `ipbridge/config.py` (`ProductionConfig`):
   - Change the `IMAGE_CACHE_PATH` if it was changed in the nginx configration.
   - Change `SERVER_NAME` to your the same as in the nginx configuration.
   - Generate a new `SECRET_KEY` via `python -c 'import os; print(os.urandom(16))'`.
