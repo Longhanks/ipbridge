@@ -16,7 +16,7 @@ class Config(object):
         'CACHE_KEY_PREFIX': 'ipbridge-cache:',
         'CACHE_REDIS_HOST': 'localhost',
         'CACHE_REDIS_PORT': '6379',
-        'CACHE_REDIS_URL': REDIS_URL
+        'CACHE_REDIS_URL': REDIS_URL,
     }
     READING_LIST_UNSAVED_KEY = 'readinglist:unsaved'
     READING_LIST_DELETED_KEY = 'readinglist:deleted'
@@ -30,6 +30,9 @@ class ProductionConfig(Config):
 
 
 class DevelopmentConfig(Config):
-    CACHE_CONFIG = {**Config.CACHE_CONFIG, 'CACHE_KEY_PREFIX': 'debug:adabridge-cache:'}
+    CACHE_CONFIG = {
+        **Config.CACHE_CONFIG,
+        'CACHE_KEY_PREFIX': 'debug:ipbridge-cache:',
+    }
     SERVER_NAME = None
     LOG_FILE_PATH = '/tmp/ipbridge/log/ipbridge.log'

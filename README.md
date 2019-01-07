@@ -16,18 +16,18 @@ REST access to local macOS services. Current features:
 
 ## Requirements
 
-- [pipenv](https://pipenv.readthedocs.io/en/latest/ "pipenv")
+- [poetry](https://poetry.eustace.io "poetry")
 - [redis](https://redis.io "redis")
 - [ipbridge-web](https://github.com/Longhanks/ipbridge-web "ipbridge-web") (Front End)
 
 ## Installation
 
 ```bash
-pipenv install
+poetry install
 ```
 
 Granting assistive access via System Preferences is required for these processes:
-- Development: ```/usr/local/Cellar/python/3.7.0/Frameworks/Python.framework/Versions/3.7/Resources/Python.app/Contents/MacOS/Python```
+- Development: ```/usr/local/Cellar/python/3.7.2/Frameworks/Python.framework/Versions/3.7/Resources/Python.app/Contents/MacOS/Python```
 - Production: ```/usr/local/bin/gunicorn```
 
 ## Running
@@ -35,7 +35,7 @@ Granting assistive access via System Preferences is required for these processes
 ### Development
 
 ```bash
-FLASK_APP=ipbridge_app.py FLASK_ENV=development python3 -m flask run
+FLASK_APP=ipbridge_app.py FLASK_ENV=development poetry run python3 -m flask run
 ```
 
 ### Production
