@@ -7,4 +7,8 @@ from ipbridge.config import ProductionConfig
 class IsoLogger(Logger):
     def setup(self, cfg):
         super().setup(cfg)
-        self._set_handler(self.error_log, cfg.errorlog, IsoFormatter(ProductionConfig.ERROR_FMT))
+        self._set_handler(
+            self.error_log,
+            cfg.errorlog,
+            IsoFormatter(ProductionConfig.ERROR_FMT),
+        )

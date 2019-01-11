@@ -4,6 +4,7 @@ from flask_login import current_user
 from flask_socketio import disconnect, emit
 
 import functools
+import shlex
 import subprocess
 
 from ipbridge.extensions import socketio
@@ -27,10 +28,13 @@ def ws_login_required(f):
 def on_request_initial():
     current_app.logger.info('Log stream client wants initial data.')
     try:
-        out = subprocess.check_output(['/usr/bin/tail', '-n', '200', current_app.config['LOG_FILE_PATH']],
-                                      stderr=subprocess.DEVNULL,
-                                      universal_newlines=True)
-        out = out[:len(out) - 1]
+        cmd = '/usr/bin/tail -n 200 ' + current_app.config['LOG_FILE_PATH']
+        out = subprocess.check_output(
+            shlex.split(cmd),
+            stderr=subprocess.DEVNULL,
+            universal_newlines=True,
+        )
+        out = out[: len(out) - 1]
     except subprocess.CalledProcessError as e:
         out = str(e)
     emit('initial-data', {'data': out})

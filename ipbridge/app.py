@@ -44,24 +44,27 @@ def create_app() -> Flask:
         sys.exit(1)
 
     if get_debug_flag():
+
         @app.after_request
         def after_request(response):
-            response.headers['Access-Control-Allow-Origin'] = 'http://localhost:8080'
-            response.headers['Access-Control-Allow-Methods'] = ','.join(['DELETE',
-                                                                         'GET',
-                                                                         'OPTIONS',
-                                                                         'PATCH',
-                                                                         'POST',
-                                                                         'PUT'])
-            response.headers['Access-Control-Allow-Headers'] = ','.join(['accept',
-                                                                         'accept-encoding',
-                                                                         'authorization',
-                                                                         'content-type',
-                                                                         'dnt',
-                                                                         'origin',
-                                                                         'user-agent',
-                                                                         'x-csrftoken',
-                                                                         'x-requested-with'])
+            origin = 'http://localhost:8080'
+            response.headers['Access-Control-Allow-Origin'] = origin
+            response.headers['Access-Control-Allow-Methods'] = ','.join(
+                ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
+            )
+            response.headers['Access-Control-Allow-Headers'] = ','.join(
+                [
+                    'accept',
+                    'accept-encoding',
+                    'authorization',
+                    'content-type',
+                    'dnt',
+                    'origin',
+                    'user-agent',
+                    'x-csrftoken',
+                    'x-requested-with',
+                ]
+            )
             response.headers['Access-Control-Allow-Credentials'] = 'true'
             return response
 
@@ -69,14 +72,23 @@ def create_app() -> Flask:
     register_blueprints(app)
 
     def start_logstream():
-        process = subprocess.Popen([sys.executable,
-                                    app.root_path + '/logstream.py',
-                                    app.config['LOG_FILE_PATH'],
-                                    app.config['REDIS_URL']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        process = subprocess.Popen(
+            [
+                sys.executable,
+                app.root_path + '/logstream.py',
+                app.config['LOG_FILE_PATH'],
+                app.config['REDIS_URL'],
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
         try:
             app.logger.info('Requested log stream.')
             process.wait(timeout=5)
-            app.logger.info('Log stream process exited: There is already a running logstream.')
+            app.logger.info(
+                'Log stream process exited: '
+                + 'There is already a running logstream.'
+            )
         except subprocess.TimeoutExpired:
             app.logger.info('Keeping log stream up.')
 
@@ -89,17 +101,26 @@ def create_app() -> Flask:
 def check_configuration(app):
     log_file_path = Path(app.config['LOG_FILE_PATH'])
     if log_file_path.is_dir():
-        raise ConfigurationError(f'LOG_FILE_PATH faulty: {log_file_path} is a directory!')
+        raise ConfigurationError(
+            f'LOG_FILE_PATH faulty: {log_file_path} is a directory!'
+        )
     if not log_file_path.parent.exists():
         try:
             log_file_path.parent.mkdir(parents=True)
         except PermissionError:
             raise ConfigurationError(
-                f'LOG_FILE_PATH faulty: Permission denied while ensuring directories for {log_file_path}!')
+                'LOG_FILE_PATH faulty: '
+                + 'Permission denied while ensuring directories for '
+                + f'{log_file_path}!'
+            )
     try:
         open(log_file_path, 'a').close()
     except PermissionError:
-        raise ConfigurationError(f'LOG_FILE_PATH faulty: Permission denied for opening {log_file_path}!')
+        raise ConfigurationError(
+            'LOG_FILE_PATH faulty: '
+            + 'Permission denied for opening '
+            + f'{log_file_path}!'
+        )
 
 
 def register_extensions(app):

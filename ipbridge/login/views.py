@@ -27,7 +27,9 @@ def login():
     username = payload.get('username', '')
     password = payload.get('password', '')
     remember_me = payload.get('rememberMe', '')
-    current_app.logger.info(f'Login attempt, username={username}, remember={remember_me}')
+    current_app.logger.info(
+        f'Login attempt, username={username}, remember={remember_me}'
+    )
     if not simplepam.authenticate(username, password):
         abort(401)
     login_user(User(username), remember=remember_me)

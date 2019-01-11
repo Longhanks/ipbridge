@@ -10,7 +10,14 @@ class ReadinglistItem:
     date: datetime
     preview: str
 
-    def __init__(self, title: str, url: str, image_url: Optional[str], date: datetime, preview: Optional[str]):
+    def __init__(
+        self,
+        title: str,
+        url: str,
+        image_url: Optional[str],
+        date: datetime,
+        preview: Optional[str],
+    ):
         self.title = title
         self.url = url
         self.image_url = image_url
@@ -23,5 +30,5 @@ class ReadinglistItem:
             'url': self.url,
             'image_url': self.image_url,
             'date': self.date,
-            'preview': self.preview
+            'preview': self.preview,
         }
