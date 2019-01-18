@@ -75,15 +75,16 @@ class Contact(object):
 def get_contacts():
     if get_debug_flag():
         contacts = []
-        contacts.append(
-            Contact(
-                'Testy',
-                'McTestFace',
-                'Tester',
-                ['+41 44 668 18 00'],
-                ['testy@tester.com'],
+        for i in range(5):
+            contacts.append(
+                Contact(
+                    f'Testy #{i}',
+                    'McTestFace',
+                    'Tester',
+                    ['+41 44 668 18 00'],
+                    ['testy@tester.com'],
+                )
             )
-        )
         return contacts
 
     libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]

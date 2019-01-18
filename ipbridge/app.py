@@ -8,7 +8,7 @@ import sys
 from flask import Flask
 from flask.helpers import get_debug_flag
 
-from ipbridge import contacts, debug, login, logs, readinglist
+from ipbridge import contacts, debug, login, logs, messages, readinglist
 from ipbridge.extensions import cache, login_manager, socketio
 from ipbridge.isoformatter import IsoFormatter
 from ipbridge.user import User
@@ -139,4 +139,5 @@ def register_blueprints(app):
         app.register_blueprint(debug.views.blueprint)
     app.register_blueprint(login.views.blueprint)
     app.register_blueprint(logs.views.blueprint)
+    app.register_blueprint(messages.views.blueprint)
     app.register_blueprint(readinglist.views.blueprint)
