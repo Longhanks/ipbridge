@@ -35,6 +35,17 @@ class Contact(object):
         self.phone_numbers = phone_numbers
         self.email_addresses = email_addresses
 
+    def __eq__(self, other):
+        if isinstance(other, Contact):
+            return (
+                self.given_name == other.given_name
+                and self.family_name == other.family_name
+                and self.nick_name == other.nick_name
+                and self.phone_numbers == other.phone_numbers
+                and self.email_addresses == other.email_addresses
+            )
+        return NotImplemented
+
     def __str__(self):
         display_name = ''
         if self.given_name:

@@ -21,6 +21,7 @@ redis = "*"
 eventlet = "*"
 gunicorn = "*"
 pid = "*"
+phonenumbers = "*"
 
 [tool.poetry.dev-dependencies]
 

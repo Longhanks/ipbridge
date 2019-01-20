@@ -3,7 +3,10 @@
 from contextlib import contextmanager
 import datetime
 from pathlib import Path
+import phonenumbers
 import sqlite3
+
+from ipbridge.contacts import contacts
 
 MESSAGES_DB = Path.home() / 'Library' / 'Messages' / 'chat.db'
 
@@ -19,6 +22,63 @@ CHAT_PROPERTIES = [
 HANDLE_PROPERTIES = ['ROWID', 'uncanonicalized_id', 'id']
 
 
+def _merge_same_chats(chats):
+    all_contacts = contacts.get_contacts()
+
+    def _id_for_handle(handle):
+        for contact in all_contacts:
+            for mail in contact.email_addresses:
+                if mail == handle['id']:
+                    return contact
+            try:
+                handle_number = phonenumbers.parse(handle['id'])
+            except phonenumbers.NumberParseException:
+                continue
+            if not phonenumbers.is_valid_number(handle_number):
+                continue
+            for number in contact.phone_numbers:
+                try:
+                    contact_number = phonenumbers.parse(
+                        number['value'], number['country_code']
+                    )
+                except phonenumbers.NumberParseException:
+                    continue
+                if not phonenumbers.is_valid_number(contact_number):
+                    continue
+                if contact_number == handle_number:
+                    return contact
+        return handle['id']
+
+    final_chats = []
+    potentially_mergable = []
+    for chat in chats:
+        if (
+            chat['display_name'] is not None
+            or chat['room_name'] is not None
+            or len(chat['handles']) > 1
+        ):
+            final_chats.append(chat)
+        else:
+            potentially_mergable.append(chat)
+    while True:
+        if not potentially_mergable:
+            break
+        current = potentially_mergable.pop(0)
+        current_id = _id_for_handle(current['handles'][0])
+
+        to_remove = []
+        for other in potentially_mergable:
+            other_id = _id_for_handle(other['handles'][0])
+            if current_id == other_id:
+                current['ROWIDs'].append(other['ROWIDs'][0])
+                to_remove.append(other)
+        final_chats.append(current)
+        potentially_mergable = [
+            v for v in potentially_mergable if v not in to_remove
+        ]
+    return final_chats
+
+
 @contextmanager
 def connect_db():
     connection = sqlite3.connect(MESSAGES_DB)
@@ -31,9 +91,7 @@ def get_chats():
     with connect_db() as connection:
         cursor = connection.cursor()
         cursor.execute(
-            'SELECT chat_id '
-            'FROM chat_message_join '
-            'GROUP BY chat_id '
+            'SELECT chat_id FROM chat_message_join GROUP BY chat_id '
         )
 
         chats = []
@@ -87,10 +145,17 @@ def get_chats():
                     if k in HANDLE_PROPERTIES
                 }
                 chat['handles'].append(handle)
+
+            # Make a list of ROWIDs, since chats can be merged
+            chat['ROWIDs'] = [chat['ROWID']]
+            del chat['ROWID']
             chats.append(chat)
+
+        chats = _merge_same_chats(chats)
 
         def lastMessageSorter(item):
             return datetime.datetime.fromisoformat(item['last_message'])
 
         chats.sort(key=lastMessageSorter, reverse=True)
+
         return chats
