@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from flask.helpers import get_debug_flag
 
@@ -26,7 +26,7 @@ class Contact(object):
         given_name: str,
         family_name: str,
         nick_name: Optional[str],
-        phone_numbers: List[str],
+        phone_numbers: List[Dict[str, str]],
         email_addresses: List[str],
     ):
         self.given_name = given_name
@@ -36,30 +36,32 @@ class Contact(object):
         self.email_addresses = email_addresses
 
     def __str__(self):
-        display_name = ""
+        display_name = ''
         if self.given_name:
             display_name = self.given_name
         if self.family_name:
             if not self.given_name:
                 display_name = self.family_name
             else:
-                display_name = display_name + " " + self.family_name
+                display_name = display_name + ' ' + self.family_name
         if self.nick_name:
             if display_name:
-                display_name = self.nick_name + " (" + display_name + ")"
+                display_name = self.nick_name + ' (' + display_name + ')'
             else:
                 display_name = self.nick_name
 
         display = display_name
         if self.phone_numbers or self.email_addresses:
-            display = display + ": "
+            display = display + ': '
 
-        display = display + ", ".join(self.phone_numbers)
+        display = display + ', '.join(
+            [number['value'] for number in self.phone_numbers]
+        )
 
         if self.phone_numbers and self.email_addresses:
-            display = display + ", "
+            display = display + ', '
 
-        display = display + ", ".join(self.email_addresses)
+        display = display + ', '.join(self.email_addresses)
         return display
 
     def serialize(self):
@@ -81,7 +83,7 @@ def get_contacts():
                     f'Testy #{i}',
                     'McTestFace',
                     'Tester',
-                    ['+41 44 668 18 00'],
+                    [{'country_code': 'CH', 'value': '+41 44 668 18 00'}],
                     ['testy@tester.com'],
                 )
             )
@@ -90,39 +92,39 @@ def get_contacts():
     libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
     libobjc.objc_msgSend.restype = c_void_p
     store = libobjc.objc_msgSend(
-        libobjc.objc_msgSend(CNContactStore, objc_selector("alloc")),
-        objc_selector("init"),
+        libobjc.objc_msgSend(CNContactStore, objc_selector('alloc')),
+        objc_selector('init'),
     )
 
     libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_ulong]
     libobjc.objc_msgSend.restype = c_void_p
     keys = libobjc.objc_msgSend(
-        NSMutableArray, objc_selector("arrayWithCapacity:"), c_ulong(5)
+        NSMutableArray, objc_selector('arrayWithCapacity:'), c_ulong(5)
     )
 
     libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_void_p]
     libobjc.objc_msgSend.restype = None
     for key in [
-        "CNContactNicknameKey",
-        "CNContactGivenNameKey",
-        "CNContactFamilyNameKey",
-        "CNContactPhoneNumbersKey",
-        "CNContactEmailAddressesKey",
+        'CNContactNicknameKey',
+        'CNContactGivenNameKey',
+        'CNContactFamilyNameKey',
+        'CNContactPhoneNumbersKey',
+        'CNContactEmailAddressesKey',
     ]:
         libobjc.objc_msgSend(
-            keys, objc_selector("addObject:"), c_void_p.in_dll(Contacts, key)
+            keys, objc_selector('addObject:'), c_void_p.in_dll(Contacts, key)
         )
 
     libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
     libobjc.objc_msgSend.restype = c_void_p
     request_mem = libobjc.objc_msgSend(
-        CNContactFetchRequest, objc_selector("alloc")
+        CNContactFetchRequest, objc_selector('alloc')
     )
 
     libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_void_p]
     libobjc.objc_msgSend.restype = c_void_p
     request = libobjc.objc_msgSend(
-        request_mem, objc_selector("initWithKeysToFetch:"), keys
+        request_mem, objc_selector('initWithKeysToFetch:'), keys
     )
 
     cncontacts = []
@@ -142,7 +144,7 @@ def get_contacts():
     libobjc.objc_msgSend.restype = c_bool
     enumerate_succeeded = libobjc.objc_msgSend(
         store,
-        objc_selector("enumerateContactsWithFetchRequest:error:usingBlock:"),
+        objc_selector('enumerateContactsWithFetchRequest:error:usingBlock:'),
         request,
         None,
         block.ptr,
@@ -153,24 +155,33 @@ def get_contacts():
 
     contacts = []
     for cncontact in cncontacts:
-        given_name_ptr = objc_property(cncontact, "givenName")
+        given_name_ptr = objc_property(cncontact, 'givenName')
         given_name = str_from_nsstring(given_name_ptr)
-        family_name_ptr = objc_property(cncontact, "familyName")
+        family_name_ptr = objc_property(cncontact, 'familyName')
         family_name = str_from_nsstring(family_name_ptr)
-        nick_name_ptr = objc_property(cncontact, "nickname")
+        nick_name_ptr = objc_property(cncontact, 'nickname')
         nick_name = str_from_nsstring(nick_name_ptr)
         phone_numbers = [
-            str_from_nsstring(
-                objc_property(objc_property(number, "value"), "stringValue")
-            )
+            {
+                'country_code': str_from_nsstring(
+                    objc_property(
+                        objc_property(number, 'value'), 'countryCode'
+                    )
+                ).upper(),
+                'value': str_from_nsstring(
+                    objc_property(
+                        objc_property(number, 'value'), 'stringValue'
+                    )
+                ),
+            }
             for number in list_from_nsarray(
-                objc_property(cncontact, "phoneNumbers")
+                objc_property(cncontact, 'phoneNumbers')
             )
         ]
         email_addresses = [
-            str_from_nsstring(objc_property(email, "value"))
+            str_from_nsstring(objc_property(email, 'value'))
             for email in list_from_nsarray(
-                objc_property(cncontact, "emailAddresses")
+                objc_property(cncontact, 'emailAddresses')
             )
         ]
 
