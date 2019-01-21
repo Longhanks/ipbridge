@@ -90,6 +90,7 @@ class Contact(object):
             'nick_name': self.nick_name,
             'phone_numbers': self.phone_numbers,
             'email_addresses': self.email_addresses,
+            'image_data': self.image_data
         }
 
 
