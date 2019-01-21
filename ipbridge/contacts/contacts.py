@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+import base64
 from typing import Dict, List, Optional
 
+from flask import current_app
 from flask.helpers import get_debug_flag
 
 if not get_debug_flag():
-    from ctypes import c_bool, c_ulong, c_void_p
+    from ctypes import c_bool, c_char_p, c_ulong, c_void_p
 
     from .objc import (
         libobjc,
@@ -14,7 +16,10 @@ if not get_debug_flag():
         CNContactFetchRequest,
         CNContactStore,
         EnumerateContactsBlock,
+        NSBitmapImageRep,
+        NSImage,
         NSMutableArray,
+        NSString,
         list_from_nsarray,
         str_from_nsstring,
     )
@@ -28,12 +33,14 @@ class Contact(object):
         nick_name: Optional[str],
         phone_numbers: List[Dict[str, str]],
         email_addresses: List[str],
+        image_data: Optional[str],
     ):
         self.given_name = given_name
         self.family_name = family_name
         self.nick_name = nick_name
         self.phone_numbers = phone_numbers
         self.email_addresses = email_addresses
+        self.image_data = image_data
 
     def __eq__(self, other):
         if isinstance(other, Contact):
@@ -43,6 +50,7 @@ class Contact(object):
                 and self.nick_name == other.nick_name
                 and self.phone_numbers == other.phone_numbers
                 and self.email_addresses == other.email_addresses
+                and self.image_data == other.image_data
             )
         return NotImplemented
 
@@ -96,6 +104,7 @@ def get_contacts():
                     'Tester',
                     [{'country_code': 'CH', 'value': '+41 44 668 18 00'}],
                     ['testy@tester.com'],
+                    None,
                 )
             )
         return contacts
@@ -110,7 +119,7 @@ def get_contacts():
     libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_ulong]
     libobjc.objc_msgSend.restype = c_void_p
     keys = libobjc.objc_msgSend(
-        NSMutableArray, objc_selector('arrayWithCapacity:'), c_ulong(5)
+        NSMutableArray, objc_selector('arrayWithCapacity:'), c_ulong(7)
     )
 
     libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_void_p]
@@ -121,6 +130,8 @@ def get_contacts():
         'CNContactFamilyNameKey',
         'CNContactPhoneNumbersKey',
         'CNContactEmailAddressesKey',
+        'CNContactImageDataAvailableKey',
+        'CNContactImageDataKey',
     ]:
         libobjc.objc_msgSend(
             keys, objc_selector('addObject:'), c_void_p.in_dll(Contacts, key)
@@ -205,6 +216,57 @@ def get_contacts():
         ):
             continue
 
+        base64_str = None
+
+        image_data_available = bool(
+            objc_property(cncontact, 'imageDataAvailable')
+        )
+
+        if image_data_available:
+            data_ptr = objc_property(cncontact, 'imageData')
+            libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
+            libobjc.objc_msgSend.restype = c_void_p
+            image_mem = libobjc.objc_msgSend(NSImage, objc_selector('alloc'))
+            libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_void_p]
+            image = libobjc.objc_msgSend(
+                image_mem, objc_selector('initWithData:'), data_ptr
+            )
+            libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
+            tiff_data = libobjc.objc_msgSend(
+                image, objc_selector('TIFFRepresentation')
+            )
+
+            libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_void_p]
+            bitmap = libobjc.objc_msgSend(
+                NSBitmapImageRep, objc_selector('imageRepWithData:'), tiff_data
+            )
+
+            NSBitmapImageFileTypePNG = c_ulong(4)
+            libobjc.objc_msgSend.argtypes = [
+                c_void_p,
+                c_void_p,
+                c_ulong,
+                c_void_p,
+            ]
+            png_data = libobjc.objc_msgSend(
+                bitmap,
+                objc_selector('representationUsingType:properties:'),
+                NSBitmapImageFileTypePNG,
+                None,
+            )
+
+            libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_ulong]
+            base64_nsstring = libobjc.objc_msgSend(
+                png_data,
+                objc_selector('base64EncodedStringWithOptions:'),
+                c_ulong(0),
+            )
+            base64_str = str_from_nsstring(base64_nsstring)
+
+            libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
+            libobjc.objc_msgSend.restype = c_void_p
+            libobjc.objc_msgSend(image, objc_selector('release'))
+
         contacts.append(
             Contact(
                 given_name,
@@ -212,7 +274,12 @@ def get_contacts():
                 nick_name,
                 phone_numbers,
                 email_addresses,
+                base64_str,
             )
         )
 
+    libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
+    libobjc.objc_msgSend.restype = c_void_p
+    libobjc.objc_msgSend(store, objc_selector('release'))
+    libobjc.objc_msgSend(request, objc_selector('release'))
     return contacts

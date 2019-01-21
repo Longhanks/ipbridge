@@ -16,8 +16,8 @@ from ctypes import (
 )
 import ctypes.util
 
-libc = CDLL(ctypes.util.find_library("c"))
-libobjc = CDLL(ctypes.util.find_library("objc"))
+libc = CDLL(ctypes.util.find_library('c'))
+libobjc = CDLL(ctypes.util.find_library('objc'))
 
 libobjc.objc_getClass.restype = c_void_p
 libobjc.objc_getClass.argtypes = [c_char_p]
@@ -30,7 +30,7 @@ libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
 
 
 # from Block_private.h
-_NSConcreteStackBlock = (c_void_p * 32).in_dll(libc, "_NSConcreteStackBlock")
+_NSConcreteStackBlock = (c_void_p * 32).in_dll(libc, '_NSConcreteStackBlock')
 
 BLOCK_HAS_COPY_DISPOSE = 1 << 25
 BLOCK_HAS_STRET = 1 << 29
@@ -39,21 +39,21 @@ BLOCK_HAS_SIGNATURE = 1 << 30
 
 class Block_descriptor(Structure):
     _fields_ = [
-        ("reserved", c_ulong),
-        ("size", c_ulong),
-        ("copy", CFUNCTYPE(c_void_p, c_void_p, c_void_p)),
-        ("dispose", CFUNCTYPE(c_void_p, c_void_p)),
-        ("signature", c_char_p),
+        ('reserved', c_ulong),
+        ('size', c_ulong),
+        ('copy', CFUNCTYPE(c_void_p, c_void_p, c_void_p)),
+        ('dispose', CFUNCTYPE(c_void_p, c_void_p)),
+        ('signature', c_char_p),
     ]
 
 
 class Block_layout(Structure):
     _fields_ = [
-        ("isa", c_void_p),
-        ("flags", c_int),
-        ("reserved", c_int),
-        ("invoke", c_void_p),
-        ("descriptor", c_void_p),
+        ('isa', c_void_p),
+        ('flags', c_int),
+        ('reserved', c_int),
+        ('invoke', c_void_p),
+        ('descriptor', c_void_p),
     ]
 
 
@@ -81,7 +81,7 @@ class EnumerateContactsBlock:
         self.descriptor.copy = self.cfunc_copy
         self.descriptor.dispose = self.cfunc_dispose
 
-        self.descriptor.signature = b"v@?^v^B"
+        self.descriptor.signature = b'v@?^v^B'
         self.block.descriptor = cast(byref(self.descriptor), c_void_p)
         self.ptr = cast(byref(self.block), c_void_p)
 
@@ -96,7 +96,7 @@ class EnumerateContactsBlock:
 
 
 def objc_class(name):
-    return libobjc.objc_getClass(name.encode("utf-8"))
+    return libobjc.objc_getClass(name.encode('utf-8'))
 
 
 def objc_property(obj, property):
@@ -106,17 +106,17 @@ def objc_property(obj, property):
 
 
 def objc_selector(name):
-    return libobjc.sel_registerName(name.encode("utf-8"))
+    return libobjc.sel_registerName(name.encode('utf-8'))
 
 
 def list_from_nsarray(nsarray):
     libobjc.objc_msgSend.restype = c_ulong
     libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
-    count = libobjc.objc_msgSend(nsarray, objc_selector("count"))
+    count = libobjc.objc_msgSend(nsarray, objc_selector('count'))
     libobjc.objc_msgSend.restype = c_void_p
     libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_ulong]
     return [
-        libobjc.objc_msgSend(nsarray, objc_selector("objectAtIndex:"), i)
+        libobjc.objc_msgSend(nsarray, objc_selector('objectAtIndex:'), i)
         for i in range(count)
     ]
 
@@ -124,19 +124,27 @@ def list_from_nsarray(nsarray):
 def str_from_nsstring(nsstring):
     libobjc.objc_msgSend.restype = c_void_p
     libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
-    ns_void_ptr = libobjc.objc_msgSend(nsstring, objc_selector("UTF8String"))
+    ns_void_ptr = libobjc.objc_msgSend(nsstring, objc_selector('UTF8String'))
     ns_ptr = cast(ns_void_ptr, c_char_p)
-    return ns_ptr.value.decode("utf-8")
+    return ns_ptr.value.decode('utf-8')
 
 
 # Foundation classes
-Foundation = CDLL(ctypes.util.find_library("Foundation"))
+Foundation = CDLL(ctypes.util.find_library('Foundation'))
 
-NSMutableArray = objc_class("NSMutableArray")
+NSMutableArray = objc_class('NSMutableArray')
+NSString = objc_class('NSString')
 
 
 # Contacts classes
-Contacts = CDLL(ctypes.util.find_library("Contacts"))
+Contacts = CDLL(ctypes.util.find_library('Contacts'))
 
-CNContactStore = objc_class("CNContactStore")
-CNContactFetchRequest = objc_class("CNContactFetchRequest")
+CNContactStore = objc_class('CNContactStore')
+CNContactFetchRequest = objc_class('CNContactFetchRequest')
+
+
+# AppKit classes
+AppKit = CDLL(ctypes.util.find_library('AppKit'))
+
+NSBitmapImageRep = objc_class('NSBitmapImageRep')
+NSImage = objc_class('NSImage')
