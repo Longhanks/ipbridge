@@ -2,27 +2,23 @@
 import base64
 from typing import Dict, List, Optional
 
-from flask import current_app
-from flask.helpers import get_debug_flag
+from ctypes import c_bool, c_char_p, c_ulong, c_void_p
 
-if not get_debug_flag():
-    from ctypes import c_bool, c_char_p, c_ulong, c_void_p
-
-    from .objc import (
-        libobjc,
-        objc_property,
-        objc_selector,
-        Contacts,
-        CNContactFetchRequest,
-        CNContactStore,
-        EnumerateContactsBlock,
-        NSBitmapImageRep,
-        NSImage,
-        NSMutableArray,
-        NSString,
-        list_from_nsarray,
-        str_from_nsstring,
-    )
+from .objc import (
+    libobjc,
+    objc_property,
+    objc_selector,
+    Contacts,
+    CNContactFetchRequest,
+    CNContactStore,
+    EnumerateContactsBlock,
+    NSBitmapImageRep,
+    NSImage,
+    NSMutableArray,
+    NSString,
+    list_from_nsarray,
+    str_from_nsstring,
+)
 
 
 class Contact(object):
@@ -90,26 +86,11 @@ class Contact(object):
             'nick_name': self.nick_name,
             'phone_numbers': self.phone_numbers,
             'email_addresses': self.email_addresses,
-            'image_data': self.image_data
+            'image_data': self.image_data,
         }
 
 
 def get_contacts():
-    if get_debug_flag():
-        contacts = []
-        for i in range(5):
-            contacts.append(
-                Contact(
-                    f'Testy #{i}',
-                    'McTestFace',
-                    'Tester',
-                    [{'country_code': 'CH', 'value': '+41 44 668 18 00'}],
-                    ['testy@tester.com'],
-                    None,
-                )
-            )
-        return contacts
-
     libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
     libobjc.objc_msgSend.restype = c_void_p
     store = libobjc.objc_msgSend(
