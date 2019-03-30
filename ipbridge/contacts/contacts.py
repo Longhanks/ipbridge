@@ -90,14 +90,97 @@ class Contact(object):
         }
 
 
-def get_contacts():
-    libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
-    libobjc.objc_msgSend.restype = c_void_p
-    store = libobjc.objc_msgSend(
-        libobjc.objc_msgSend(CNContactStore, objc_selector('alloc')),
-        objc_selector('init'),
-    )
+def _contact_from_ptr(cncontact) -> Optional[Contact]:
+    given_name_ptr = objc_property(cncontact, 'givenName')
+    given_name = str_from_nsstring(given_name_ptr)
+    family_name_ptr = objc_property(cncontact, 'familyName')
+    family_name = str_from_nsstring(family_name_ptr)
+    nick_name_ptr = objc_property(cncontact, 'nickname')
+    nick_name = str_from_nsstring(nick_name_ptr)
+    phone_numbers = [
+        {
+            'country_code': str_from_nsstring(
+                objc_property(objc_property(number, 'value'), 'countryCode')
+            ).upper(),
+            'value': str_from_nsstring(
+                objc_property(objc_property(number, 'value'), 'stringValue')
+            ),
+        }
+        for number in list_from_nsarray(
+            objc_property(cncontact, 'phoneNumbers')
+        )
+    ]
+    email_addresses = [
+        str_from_nsstring(objc_property(email, 'value'))
+        for email in list_from_nsarray(
+            objc_property(cncontact, 'emailAddresses')
+        )
+    ]
 
+    if (
+        not given_name
+        and not family_name
+        and not nick_name
+        and not phone_numbers
+        and not email_addresses
+    ):
+        return None
+
+    base64_str = None
+
+    image_data_available = bool(objc_property(cncontact, 'imageDataAvailable'))
+
+    if image_data_available:
+        data_ptr = objc_property(cncontact, 'imageData')
+        libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
+        libobjc.objc_msgSend.restype = c_void_p
+        image_mem = libobjc.objc_msgSend(NSImage, objc_selector('alloc'))
+        libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_void_p]
+        image = libobjc.objc_msgSend(
+            image_mem, objc_selector('initWithData:'), data_ptr
+        )
+        libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
+        tiff_data = libobjc.objc_msgSend(
+            image, objc_selector('TIFFRepresentation')
+        )
+
+        libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_void_p]
+        bitmap = libobjc.objc_msgSend(
+            NSBitmapImageRep, objc_selector('imageRepWithData:'), tiff_data
+        )
+
+        NSBitmapImageFileTypePNG = c_ulong(4)
+        libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_ulong, c_void_p]
+        png_data = libobjc.objc_msgSend(
+            bitmap,
+            objc_selector('representationUsingType:properties:'),
+            NSBitmapImageFileTypePNG,
+            None,
+        )
+
+        libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_ulong]
+        base64_nsstring = libobjc.objc_msgSend(
+            png_data,
+            objc_selector('base64EncodedStringWithOptions:'),
+            c_ulong(0),
+        )
+        base64_str = str_from_nsstring(base64_nsstring)
+
+        libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
+        libobjc.objc_msgSend.restype = c_void_p
+        libobjc.objc_msgSend(image, objc_selector('release'))
+
+        return Contact(
+            given_name,
+            family_name,
+            nick_name,
+            phone_numbers,
+            email_addresses,
+            base64_str,
+        )
+
+
+def _make_fetch_keys():
     libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_ulong]
     libobjc.objc_msgSend.restype = c_void_p
     keys = libobjc.objc_msgSend(
@@ -118,6 +201,44 @@ def get_contacts():
         libobjc.objc_msgSend(
             keys, objc_selector('addObject:'), c_void_p.in_dll(Contacts, key)
         )
+    return keys
+
+
+def get_me_contact():
+    libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
+    libobjc.objc_msgSend.restype = c_void_p
+    store = libobjc.objc_msgSend(
+        libobjc.objc_msgSend(CNContactStore, objc_selector('alloc')),
+        objc_selector('init'),
+    )
+
+    keys = _make_fetch_keys()
+
+    libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_void_p, c_void_p]
+    libobjc.objc_msgSend.restype = c_void_p
+    me_contact_ptr = libobjc.objc_msgSend(
+        store,
+        objc_selector('unifiedMeContactWithKeysToFetch:error:'),
+        keys,
+        None,
+    )
+
+    libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
+    libobjc.objc_msgSend.restype = c_void_p
+    libobjc.objc_msgSend(store, objc_selector('release'))
+
+    return _contact_from_ptr(me_contact_ptr)
+
+
+def get_contacts():
+    libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
+    libobjc.objc_msgSend.restype = c_void_p
+    store = libobjc.objc_msgSend(
+        libobjc.objc_msgSend(CNContactStore, objc_selector('alloc')),
+        objc_selector('init'),
+    )
+
+    keys = _make_fetch_keys()
 
     libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
     libobjc.objc_msgSend.restype = c_void_p
@@ -159,106 +280,9 @@ def get_contacts():
 
     contacts = []
     for cncontact in cncontacts:
-        given_name_ptr = objc_property(cncontact, 'givenName')
-        given_name = str_from_nsstring(given_name_ptr)
-        family_name_ptr = objc_property(cncontact, 'familyName')
-        family_name = str_from_nsstring(family_name_ptr)
-        nick_name_ptr = objc_property(cncontact, 'nickname')
-        nick_name = str_from_nsstring(nick_name_ptr)
-        phone_numbers = [
-            {
-                'country_code': str_from_nsstring(
-                    objc_property(
-                        objc_property(number, 'value'), 'countryCode'
-                    )
-                ).upper(),
-                'value': str_from_nsstring(
-                    objc_property(
-                        objc_property(number, 'value'), 'stringValue'
-                    )
-                ),
-            }
-            for number in list_from_nsarray(
-                objc_property(cncontact, 'phoneNumbers')
-            )
-        ]
-        email_addresses = [
-            str_from_nsstring(objc_property(email, 'value'))
-            for email in list_from_nsarray(
-                objc_property(cncontact, 'emailAddresses')
-            )
-        ]
-
-        if (
-            not given_name
-            and not family_name
-            and not nick_name
-            and not phone_numbers
-            and not email_addresses
-        ):
-            continue
-
-        base64_str = None
-
-        image_data_available = bool(
-            objc_property(cncontact, 'imageDataAvailable')
-        )
-
-        if image_data_available:
-            data_ptr = objc_property(cncontact, 'imageData')
-            libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
-            libobjc.objc_msgSend.restype = c_void_p
-            image_mem = libobjc.objc_msgSend(NSImage, objc_selector('alloc'))
-            libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_void_p]
-            image = libobjc.objc_msgSend(
-                image_mem, objc_selector('initWithData:'), data_ptr
-            )
-            libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
-            tiff_data = libobjc.objc_msgSend(
-                image, objc_selector('TIFFRepresentation')
-            )
-
-            libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_void_p]
-            bitmap = libobjc.objc_msgSend(
-                NSBitmapImageRep, objc_selector('imageRepWithData:'), tiff_data
-            )
-
-            NSBitmapImageFileTypePNG = c_ulong(4)
-            libobjc.objc_msgSend.argtypes = [
-                c_void_p,
-                c_void_p,
-                c_ulong,
-                c_void_p,
-            ]
-            png_data = libobjc.objc_msgSend(
-                bitmap,
-                objc_selector('representationUsingType:properties:'),
-                NSBitmapImageFileTypePNG,
-                None,
-            )
-
-            libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p, c_ulong]
-            base64_nsstring = libobjc.objc_msgSend(
-                png_data,
-                objc_selector('base64EncodedStringWithOptions:'),
-                c_ulong(0),
-            )
-            base64_str = str_from_nsstring(base64_nsstring)
-
-            libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
-            libobjc.objc_msgSend.restype = c_void_p
-            libobjc.objc_msgSend(image, objc_selector('release'))
-
-        contacts.append(
-            Contact(
-                given_name,
-                family_name,
-                nick_name,
-                phone_numbers,
-                email_addresses,
-                base64_str,
-            )
-        )
+        contact = _contact_from_ptr(cncontact)
+        if contact:
+            contacts.append(contact)
 
     libobjc.objc_msgSend.argtypes = [c_void_p, c_void_p]
     libobjc.objc_msgSend.restype = c_void_p

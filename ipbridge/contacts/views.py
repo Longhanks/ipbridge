@@ -7,6 +7,33 @@ from flask.helpers import get_debug_flag
 blueprint = Blueprint('contacts', __name__)
 
 
+@blueprint.route('/api/mecontact', methods=['GET'])
+@login_required
+def get_me_contact():
+    if not get_debug_flag():
+        from . import contacts
+
+        me_contact = contacts.get_me_contact()
+
+        return jsonify(
+            {**me_contact.serialize(), 'display_str': str(me_contact)}
+        )
+    return jsonify(
+        {
+            'given_name': 'Testy-Me',
+            'family_name': 'McTestFace',
+            'nick_name': 'Tester',
+            'phone_numbers': [
+                {'country_code': 'CH', 'value': '+41 44 668 18 00'}
+            ],
+            'email_addresses': 'testy@tester.com',
+            'image_data': None,
+            'display_str': 'Tester (Testy-Me McTestFace): '
+            '+41 44 668 18 00, testy@tester.com',
+        }
+    )
+
+
 @blueprint.route('/api/contacts', methods=['GET'])
 @login_required
 def get_contacts():
