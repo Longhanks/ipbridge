@@ -18,6 +18,7 @@ REST access to local macOS services. Current features:
 
 - [poetry](https://poetry.eustace.io "poetry")
 - [redis](https://redis.io "redis")
+- [safari-icloud-tabs-fetcher](https://github.com/Longhanks/safari-icloud-tabs-fetcher "safari-icloud-tabs-fetcher") (Included, for iCloud Tabs functionality)
 - [ipbridge-web](https://github.com/Longhanks/ipbridge-web "ipbridge-web") (Front End)
 
 ## Installation
