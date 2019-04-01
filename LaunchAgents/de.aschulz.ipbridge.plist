@@ -4,12 +4,14 @@
         <key>KeepAlive</key>
         <true/>
         <key>Label</key>
-        <string>com.aschulz.ipbridge</string>
+        <string>de.aschulz.ipbridge</string>
         <key>WorkingDirectory</key>
         <string>/Users/aschulz/Projects/ipbridge</string>
         <key>ProgramArguments</key>
         <array>
-            <string>/usr/local/bin/gunicorn</string>
+            <string>/usr/local/bin/poetry</string>
+            <string>run</string>
+            <string>gunicorn</string>
             <string>--config</string>
             <string>ipbridge/config.py</string>
             <string>ipbridge_app</string>

@@ -27,7 +27,7 @@ poetry install
 ```
 
 Granting assistive access via System Preferences is required for these processes:
-- Development: ```/usr/local/Cellar/python/3.7.2/Frameworks/Python.framework/Versions/3.7/Resources/Python.app/Contents/MacOS/Python```
+- Development: ```/usr/local/Cellar/python/3.7.3/Frameworks/Python.framework/Versions/3.7/Resources/Python.app/Contents/MacOS/Python```
 - Production: ```/usr/local/bin/gunicorn```
 
 ## Running
