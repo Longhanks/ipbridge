@@ -137,7 +137,16 @@ def register_extensions(app):
     login_manager.init_app(app)
     login_manager.login_message = None
     login_manager.user_loader(lambda _id: User(_id))
-    socketio.init_app(app, message_queue=app.config['REDIS_URL'])
+    if get_debug_flag():
+        cors_url = 'http://localhost:8080'
+    else:
+        server_name = app.config.get('SERVER_NAME', '')
+        cors_url = f'https://{server_name}'
+    socketio.init_app(
+        app,
+        message_queue=app.config['REDIS_URL'],
+        cors_allowed_origins=cors_url,
+    )
 
 
 def register_blueprints(app):
