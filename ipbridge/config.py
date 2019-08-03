@@ -36,3 +36,4 @@ class DevelopmentConfig(Config):
     }
     SERVER_NAME = None
     LOG_FILE_PATH = '/tmp/ipbridge/log/ipbridge.log'
+    LOGIN_DISABLED = True
