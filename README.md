@@ -10,6 +10,8 @@ REST access to local macOS services. Current features:
   - Remove elements
   - Add new URLs
   - Instant response using [redis](https://redis.io "redis") cache
+- Access to the Safari iCloud tabs
+  - See all open Safari tabs on any device connected to iCloud
 - Access to the application's log file
   - Previously logged lines
   - Live stream of new log lines via [socket.io](https://socket.io "socket.io")
@@ -36,7 +38,7 @@ Granting assistive access via System Preferences is required for these processes
 ### Development
 
 ```bash
-FLASK_APP=ipbridge_app.py FLASK_ENV=development poetry run python3 -m flask run
+FLASK_APP=ipbridge_app.py FLASK_ENV=development python3 -m poetry run flask run --eager-loading
 ```
 
 ### Production
